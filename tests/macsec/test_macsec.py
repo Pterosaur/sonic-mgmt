@@ -180,7 +180,7 @@ class TestFaultHandling():
 
     def test_mismatch_macsec_configuration(self, duthost, unctrl_links,
                                            profile_name, default_priority, cipher_suite,
-                                           primary_cak, primary_ckn, policy, send_sci, request):
+                                           primary_cak, primary_ckn, policy, send_sci):
         # Only pick one uncontrolled link for mismatch macsec configuration test
         assert unctrl_links
         port_name, nbr = unctrl_links.items()[0]
@@ -208,3 +208,8 @@ class TestFaultHandling():
         disable_macsec_port(duthost, port_name)
         disable_macsec_port(nbr["host"], nbr["port"])
         delete_macsec_profile(nbr["host"], profile_name)
+
+
+class TestDeployment():
+    def config_reload(self, ):
+        pass
