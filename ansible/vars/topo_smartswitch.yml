@@ -1,0 +1,12 @@
+topology:
+  VMs:
+
+configuration_properties:
+  common:
+    dut_asn: 65100
+    dut_type: 32x400Gb
+    nhipv4: 192.168.101.50
+  tor:
+    swrole: tor
+
+configuration:
