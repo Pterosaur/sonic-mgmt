@@ -110,9 +110,6 @@ sonic_s6000:
       ansible_host: 10.250.0.122
       ansible_hostv6: fec0::ffff:afa:12
       card_type: supervisor
-    smartswitch-01:
-      ansible_host: 10.250.0.122
-
 
 sonic_s6100:
   vars:

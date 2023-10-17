@@ -65,6 +65,7 @@ all:
         vlab-11:
         vlab-12:
         vlab-8k-01:
+        smartswitch-01:
     ptf:
       hosts:
         ptf-01:
@@ -259,6 +260,9 @@ all:
           # sdk/npsuite override:
           #cisco_sdk_ver: "1.50.10.4.22"
           #cisco_npsuite_ver: "1.90.0"
+        smartswitch-01:
+          ansible_host: 192.168.101.50
+
 
 
 # The groups below are helpers to limit running playbooks to a specific server only
@@ -273,8 +277,8 @@ vm_host_1:
   hosts:
     STR-ACS-VSERV-01:
       ansible_host: 172.17.0.1
-      ansible_user: use_own_value
-      vm_host_user: use_own_value
+      ansible_user: ssproto
+      vm_host_user: ssproto
 
 vms_1:
   hosts:

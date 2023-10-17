@@ -25,6 +25,6 @@ k8s_master_password: "use_own_value"
 ptf_host_user: root
 ptf_host_pass: root
 
-vm_host_user: use_own_value
-vm_host_password: use_own_value
-vm_host_become_password: use_own_value
+vm_host_user: ssproto
+vm_host_password: w3cAm3w3sAw
+vm_host_become_password: w3cAm3w3sAw
