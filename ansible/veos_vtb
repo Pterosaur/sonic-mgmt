@@ -263,7 +263,7 @@ all:
           #cisco_sdk_ver: "1.50.10.4.22"
           #cisco_npsuite_ver: "1.90.0"
         smartswitch-01:
-          ansible_host: 10.250.0.101
+          ansible_host: 192.168.101.50
 
 
 
