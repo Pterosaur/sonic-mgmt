@@ -341,8 +341,8 @@
   group-name: vms6-1
   topo: smartswitch
   ptf_image_name: docker-ptf
-  ptf: ptf-01
-  ptf_ip: 192.168.101.102/24
+  ptf: ptf_smartswitch
+  ptf_ip: 192.168.101.181/24
   ptf_ipv6: fec0::ffff:afa:2/64
   server: server_1
   vm_base: VM0100

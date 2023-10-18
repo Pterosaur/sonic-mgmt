@@ -92,9 +92,11 @@ all:
         ptf-08:
           ansible_host: 10.250.0.119
           ansible_hostv6: fec0::ffff:afb:5
+        ptf_smartswitch:
+          ansible_host: 192.168.101.181
       vars:
-          ansible_user: root
-          ansible_password: root
+          ansible_user: ssproto
+          ansible_password: w3cAm3w3sAw
     sonic:
       vars:
         mgmt_subnet_mask_length: 24
@@ -261,7 +263,7 @@ all:
           #cisco_sdk_ver: "1.50.10.4.22"
           #cisco_npsuite_ver: "1.90.0"
         smartswitch-01:
-          ansible_host: 192.168.101.50
+          ansible_host: 10.250.0.101
 
 
 
