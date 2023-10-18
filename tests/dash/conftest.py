@@ -115,26 +115,35 @@ def dash_config_info(duthost, config_facts, minigraph_facts):
         LOCAL_ENI_MAC: "F4:93:9F:EF:C4:7E",
         REMOTE_CA_PREFIX: "20.2.2.0/24",
     }
-    loopback_intf_ip = ip_interface(list(list(config_facts["LOOPBACK_INTERFACE"].values())[0].keys())[0])
-    dash_info[LOOPBACK_IP] = str(loopback_intf_ip.ip)
-    dash_info[DUT_MAC] = config_facts["DEVICE_METADATA"]["localhost"]["mac"]
+    # loopback_intf_ip = ip_interface(list(list(config_facts["LOOPBACK_INTERFACE"].values())[0].keys())[0])
+    # dash_info[LOOPBACK_IP] = str(loopback_intf_ip.ip)
+    dash_info[LOOPBACK_IP] = "10.1.0.1"
+    dash_info[DUT_MAC] = "06:c8:c4:5e:4b:8e"
 
-    neigh_table = duthost.switch_arptable()['ansible_facts']['arptable']
-    for neigh_ip, config in list(config_facts["BGP_NEIGHBOR"].items()):
-        # Pick the first two BGP neighbor IPs since these should already be learned on the DUT
-        if ip_interface(neigh_ip).version == 4:
-            if LOCAL_PA_IP not in dash_info:
-                dash_info[LOCAL_PA_IP] = neigh_ip
-                intf, _ = get_intf_from_ip(config['local_addr'], config_facts)
-                dash_info[LOCAL_PTF_INTF] = minigraph_facts["minigraph_ptf_indices"][intf]
-                dash_info[LOCAL_PTF_MAC] = neigh_table["v4"][neigh_ip]["macaddress"]
-            elif REMOTE_PA_IP not in dash_info:
-                dash_info[REMOTE_PA_IP] = neigh_ip
-                intf, intf_ip = get_intf_from_ip(config['local_addr'], config_facts)
-                dash_info[REMOTE_PTF_INTF] = minigraph_facts["minigraph_ptf_indices"][intf]
-                dash_info[REMOTE_PTF_MAC] = neigh_table["v4"][neigh_ip]["macaddress"]
-                dash_info[REMOTE_PA_PREFIX] = str(intf_ip.network)
-                break
+    # neigh_table = duthost.switch_arptable()['ansible_facts']['arptable']
+    # for neigh_ip, config in list(config_facts["BGP_NEIGHBOR"].items()):
+    #     # Pick the first two BGP neighbor IPs since these should already be learned on the DUT
+    #     if ip_interface(neigh_ip).version == 4:
+    #         if LOCAL_PA_IP not in dash_info:
+    #             dash_info[LOCAL_PA_IP] = neigh_ip
+    #             intf, _ = get_intf_from_ip(config['local_addr'], config_facts)
+    #             dash_info[LOCAL_PTF_INTF] = minigraph_facts["minigraph_ptf_indices"][intf]
+    #             dash_info[LOCAL_PTF_MAC] = neigh_table["v4"][neigh_ip]["macaddress"]
+    #         elif REMOTE_PA_IP not in dash_info:
+    #             dash_info[REMOTE_PA_IP] = neigh_ip
+    #             intf, intf_ip = get_intf_from_ip(config['local_addr'], config_facts)
+    #             dash_info[REMOTE_PTF_INTF] = minigraph_facts["minigraph_ptf_indices"][intf]
+    #             dash_info[REMOTE_PTF_MAC] = neigh_table["v4"][neigh_ip]["macaddress"]
+    #             dash_info[REMOTE_PA_PREFIX] = str(intf_ip.network)
+    #             break
+    dash_info[LOCAL_PA_IP] = "10.0.1.2"
+    dash_info[LOCAL_PTF_INTF] = 0
+    dash_info[LOCAL_PTF_MAC] = "6a:59:43:17:e0:c5"
+
+    dash_info[REMOTE_PA_IP] = "10.0.2.2"
+    dash_info[REMOTE_PTF_INTF] = 1
+    dash_info[REMOTE_PTF_MAC] = "6e:37:55:50:83:1b"
+    dash_info[REMOTE_PA_PREFIX] = "10.0.2.0/24"
 
     return dash_info
 
