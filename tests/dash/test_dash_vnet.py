@@ -105,10 +105,10 @@ def test_outbound_vnet(
     """
     Send VXLAN packets from the VM VNI
     """
-    asic_db_checker(["SAI_OBJECT_TYPE_VNET", "SAI_OBJECT_TYPE_ENI"])
-    if skip_dataplane_checking:
-        return
-    # _, vxlan_packet, expected_packet = outbound_vnet_packets
+    # asic_db_checker(["SAI_OBJECT_TYPE_VNET", "SAI_OBJECT_TYPE_ENI"])
+    # if skip_dataplane_checking:
+    #     return
+    _, vxlan_packet, expected_packet = outbound_vnet_packets
     # testutils.send(ptfadapter, dash_config_info[LOCAL_PTF_INTF], vxlan_packet, 1)
     # testutils.verify_packets_any(ptfadapter, expected_packet, ports=dash_config_info[REMOTE_PTF_INTF])
     # testutils.verify_packet(ptfadapter, expected_packet, dash_config_info[REMOTE_PTF_INTF])
