@@ -66,6 +66,7 @@ def skip_dataplane_checking(request):
 
 @pytest.fixture(scope="module")
 def config_facts(duthost):
+    return
     return duthost.config_facts(host=duthost.hostname, source="running")['ansible_facts']
 
 
@@ -80,6 +81,7 @@ def minigraph_facts(duthosts, rand_one_dut_hostname, tbinfo):
     Returns:
         Dictionary containing minigraph information
     """
+    return
     duthost = duthosts[rand_one_dut_hostname]
 
     return duthost.get_extended_minigraph_facts(tbinfo)
