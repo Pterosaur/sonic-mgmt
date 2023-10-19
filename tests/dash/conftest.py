@@ -145,7 +145,7 @@ def dash_config_info(duthost, config_facts, minigraph_facts):
     dash_info[REMOTE_PA_IP] = "10.0.0.3"
     dash_info[REMOTE_PTF_INTF] = 1
     dash_info[REMOTE_PTF_MAC] = "34:88:18:b8:24:00"
-    dash_info[REMOTE_PA_PREFIX] = "10.0.2.0/24"
+    dash_info[REMOTE_PA_PREFIX] = "10.0.0.0/24"
 
     return dash_info
 
