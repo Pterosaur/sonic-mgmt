@@ -138,11 +138,11 @@ def dash_config_info(duthost, config_facts, minigraph_facts):
     #             dash_info[REMOTE_PTF_MAC] = neigh_table["v4"][neigh_ip]["macaddress"]
     #             dash_info[REMOTE_PA_PREFIX] = str(intf_ip.network)
     #             break
-    dash_info[LOCAL_PA_IP] = "10.0.1.2"
+    dash_info[LOCAL_PA_IP] = "10.0.0.1"
     dash_info[LOCAL_PTF_INTF] = 0
     dash_info[LOCAL_PTF_MAC] = "34:88:18:b8:24:00"
 
-    dash_info[REMOTE_PA_IP] = "10.0.2.2"
+    dash_info[REMOTE_PA_IP] = "10.0.0.3"
     dash_info[REMOTE_PTF_INTF] = 1
     dash_info[REMOTE_PTF_MAC] = "34:88:18:b8:24:00"
     dash_info[REMOTE_PA_PREFIX] = "10.0.2.0/24"
