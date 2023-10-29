@@ -181,7 +181,7 @@ def apply_gnmi_cert(duthost, ptfhost):
     dut_command += "--server_key %s%s " % (env.gnmi_cert_path, env.gnmi_server_key)
     dut_command += "--ca_crt %s%s " % (env.gnmi_cert_path, env.gnmi_ca_cert)
     if env.enable_zmq:
-        dut_command += " -zmq_address=tcp://127.0.0.1:8100 "
+        dut_command += " -zmq_address=tcp://169.254.200.1:8100 "
     dut_command += " -allow_no_client_auth=true -gnmi_native_write=true -v=10 >/root/gnmi.log 2>&1 &\""
     duthost.shell(dut_command)
     time.sleep(env.gnmi_server_start_wait_time)

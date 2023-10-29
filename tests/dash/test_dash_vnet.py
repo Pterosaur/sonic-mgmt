@@ -109,6 +109,8 @@ def test_outbound_vnet(
     # if skip_dataplane_checking:
     #     return
     _, vxlan_packet, expected_packet = outbound_vnet_packets
+    import pdb
+    pdb.set_trace()
     # testutils.send(ptfadapter, dash_config_info[LOCAL_PTF_INTF], vxlan_packet, 1)
     # testutils.verify_packets_any(ptfadapter, expected_packet, ports=dash_config_info[REMOTE_PTF_INTF])
     # testutils.verify_packet(ptfadapter, expected_packet, dash_config_info[REMOTE_PTF_INTF])
