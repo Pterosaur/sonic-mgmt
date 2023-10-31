@@ -119,8 +119,8 @@ def dash_config_info(duthost, config_facts, minigraph_facts):
     }
     # loopback_intf_ip = ip_interface(list(list(config_facts["LOOPBACK_INTERFACE"].values())[0].keys())[0])
     # dash_info[LOOPBACK_IP] = str(loopback_intf_ip.ip)
-    dash_info[LOOPBACK_IP] = "10.1.0.1"
-    dash_info[DUT_MAC] = "94:6d:ae:be:4b:8a"
+    dash_info[LOOPBACK_IP] = "10.0.0.0"
+    dash_info[DUT_MAC] = "34:88:18:b8:24:00"
 
     # neigh_table = duthost.switch_arptable()['ansible_facts']['arptable']
     # for neigh_ip, config in list(config_facts["BGP_NEIGHBOR"].items()):
@@ -140,12 +140,12 @@ def dash_config_info(duthost, config_facts, minigraph_facts):
     #             break
     dash_info[LOCAL_PA_IP] = "10.0.0.1"
     dash_info[LOCAL_PTF_INTF] = 0
-    dash_info[LOCAL_PTF_MAC] = "34:88:18:b8:24:00"
+    dash_info[LOCAL_PTF_MAC] = "10:70:fd:51:ea:6c"
 
     # dash_info[REMOTE_PA_IP] = "10.0.0.3"
     dash_info[REMOTE_PA_IP] = "10.0.0.8"
     dash_info[REMOTE_PTF_INTF] = 1
-    dash_info[REMOTE_PTF_MAC] = "34:88:18:b8:24:00"
+    dash_info[REMOTE_PTF_MAC] = "10:70:fd:51:ea:6d"
     dash_info[REMOTE_PA_PREFIX] = "10.0.0.0/24"
 
     return dash_info
