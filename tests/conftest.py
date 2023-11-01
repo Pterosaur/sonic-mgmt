@@ -2281,7 +2281,7 @@ def verify_packets_any_fixed(test, pkt, ports=[], device_number=0, timeout=None)
 
 # HACK: testutils.verify_packets_any to workaround code bug
 # TODO: delete me when ptf version is advanced than https://github.com/p4lang/ptf/pull/139
-testutils.verify_packets_any = verify_packets_any_fixed
+# testutils.verify_packets_any = verify_packets_any_fixed
 
 # HACK: We are using set_do_not_care_scapy but it will be deprecated.
 if not hasattr(Mask, "set_do_not_care_scapy"):

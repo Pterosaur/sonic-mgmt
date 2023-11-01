@@ -42,7 +42,7 @@ CONTAINER_NAME=""
 IMAGE_ID=""
 LINK_DIR=""
 MOUNT_POINTS="-v \"/var/run/docker.sock:/var/run/docker.sock:rslave\""
-PUBLISH_PORTS=""
+PUBLISH_PORTS=" --network=host "
 FORCE_REMOVAL="${NO_PARAM}"
 VERBOSE_LEVEL="${VERBOSE_MIN}"
 SILENT_HOOK="&> /dev/null"
@@ -129,7 +129,7 @@ function show_local_container_login() {
 
     echo "******************************************************************************"
     echo "EXEC: docker exec --user ${USER} -ti ${CONTAINER_NAME} bash"
-    echo "SSH:  ssh -i ~/.ssh/id_rsa_docker_sonic_mgmt ${USER}@${CONTAINER_IPV4}"
+    # echo "SSH:  ssh -i ~/.ssh/id_rsa_docker_sonic_mgmt ${USER}@${CONTAINER_IPV4}"
     echo "******************************************************************************"
 }
 
