@@ -123,7 +123,7 @@ class PTFSSAdapter(BaseTest):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.kill()
+        self.dataplane.kill()
 
 
 @pytest.fixture
