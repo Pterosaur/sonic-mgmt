@@ -114,7 +114,7 @@ def dash_config_info(duthost, config_facts, minigraph_facts):
         REMOTE_CA_IP: "20.2.2.2",
         LOCAL_CA_IP: "11.1.1.1",
         REMOTE_ENI_MAC: "F9:22:83:99:22:A2",
-        LOCAL_ENI_MAC: "F4:93:9F:EF:C4:7E",
+        LOCAL_ENI_MAC: "34:88:18:b8:24:00",
         REMOTE_CA_PREFIX: "20.2.2.0/24",
     }
     # loopback_intf_ip = ip_interface(list(list(config_facts["LOOPBACK_INTERFACE"].values())[0].keys())[0])

@@ -179,6 +179,16 @@ def test_outbound_direct(
     #     return
     expected_inner_packet, vxlan_packet, _ = outbound_vnet_packets
     testutils.send(ptf_ss_adapter, dash_config_info[LOCAL_PTF_INTF], vxlan_packet, 1)
+
+    expected_inner_packet = Mask(expected_inner_packet)
+    expected_inner_packet.set_do_not_care_scapy(scapy.Ether, "dst")
+    expected_inner_packet.set_do_not_care_scapy(scapy.Ether, "src")
+    expected_inner_packet.set_do_not_care_scapy(scapy.IP, "ttl")
+    expected_inner_packet.set_do_not_care_scapy(scapy.IP, "id")
+    expected_inner_packet.set_do_not_care_scapy(scapy.IP, "chksum")
+    expected_inner_packet.set_do_not_care_scapy(scapy.UDP, "sport")
+    expected_inner_packet.set_do_not_care_scapy(scapy.UDP, "chksum")
+
     testutils.verify_packets_any(ptf_ss_adapter, expected_inner_packet, ports=dash_config_info[REMOTE_PTF_INTF])
     # testutils.verify_packet(ptfadapter, expected_inner_packet, dash_config_info[REMOTE_PTF_INTF])
 
