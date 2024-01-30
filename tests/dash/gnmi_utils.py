@@ -33,7 +33,7 @@ class GNMIEnvironment(object):
         self.gnmi_client_cert = "gnmiclient.crt"
         self.gnmi_client_key = "gnmiclient.key"
         self.gnmi_server_start_wait_time = 30
-        self.enable_zmq = duthost.shell("netstat -na | grep -w 8100", module_ignore_errors=True)['rc'] == 0
+        self.enable_zmq = True  # duthost.shell("netstat -na | grep -w 8100", module_ignore_errors=True)['rc'] == 0
 
 
 def create_ext_conf(ip, filename):
@@ -181,8 +181,8 @@ def apply_gnmi_cert(duthost, ptfhost):
     dut_command += "--server_key %s%s " % (env.gnmi_cert_path, env.gnmi_server_key)
     dut_command += "--ca_crt %s%s " % (env.gnmi_cert_path, env.gnmi_ca_cert)
     if env.enable_zmq:
-        dut_command += " -zmq_address=tcp://127.0.0.1:8100 "
-    dut_command += "-gnmi_native_write=true -v=10 >/root/gnmi.log 2>&1 &\""
+        dut_command += " -zmq_address=tcp://169.254.200.1:8100 "
+    dut_command += " -allow_no_client_auth=true -gnmi_native_write=true -v=10 >/root/gnmi.log 2>&1 &\""
     duthost.shell(dut_command)
     time.sleep(env.gnmi_server_start_wait_time)
 
@@ -226,13 +226,13 @@ def gnmi_set(duthost, ptfhost, delete_list, update_list, replace_list):
     env = GNMIEnvironment(duthost)
     ip = duthost.mgmt_ip
     port = env.gnmi_port
-    cmd = 'python2 /root/gnxi/gnmi_cli_py/py_gnmicli.py '
+    cmd = 'python /home/ssproto/dev/gnxi/gnmi_cli_py/py_gnmicli.py '
     cmd += '--timeout 30 '
     cmd += '-t %s -p %u ' % (ip, port)
     cmd += '-xo sonic-db '
     cmd += '-rcert /root/%s ' % (env.gnmi_ca_cert)
-    cmd += '-pkey /root/%s ' % (env.gnmi_client_key)
-    cmd += '-cchain /root/%s ' % (env.gnmi_client_cert)
+    # cmd += '-pkey /root/%s ' % (env.gnmi_client_key)
+    # cmd += '-cchain /root/%s ' % (env.gnmi_client_cert)
     cmd += '-m set-update '
     xpath = ''
     xvalue = ''
@@ -282,7 +282,7 @@ def gnmi_get(duthost, ptfhost, path_list):
     env = GNMIEnvironment(duthost)
     ip = duthost.mgmt_ip
     port = env.gnmi_port
-    cmd = 'python2 /root/gnxi/gnmi_cli_py/py_gnmicli.py '
+    cmd = 'python /home/ssproto/dev/gnxi/gnmi_cli_py/py_gnmicli.py '
     cmd += '--timeout 30 '
     cmd += '-t %s -p %u ' % (ip, port)
     cmd += '-xo sonic-db '

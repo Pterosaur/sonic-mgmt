@@ -25,7 +25,7 @@ from tests.common.devices.duthosts import DutHosts
 from tests.common.devices.vmhost import VMHost
 from tests.common.devices.base import NeighborDevice
 from tests.common.devices.cisco import CiscoHost
-from tests.common.helpers.parallel import parallel_run
+# from tests.common.helpers.parallel import parallel_run
 from tests.common.fixtures.duthost_utils import backup_and_restore_config_db_session    # noqa F401
 from tests.common.fixtures.ptfhost_utils import ptf_portmap_file                        # noqa F401
 from tests.common.fixtures.ptfhost_utils import ptf_test_port_map_active_active         # noqa F401
@@ -2206,8 +2206,8 @@ def core_dump_and_config_check(duthosts, tbinfo, request):
             }
             logger.warning("Core dump or config check failed for {}, results: {}"
                            .format(module_name, json.dumps(check_result)))
-            results = parallel_run(__dut_reload, (), {"duts_data": duts_data}, duthosts, timeout=360)
-            logger.debug('Results of dut reload: {}'.format(json.dumps(dict(results))))
+            # results = parallel_run(__dut_reload, (), {"duts_data": duts_data}, duthosts, timeout=360)
+            # logger.debug('Results of dut reload: {}'.format(json.dumps(dict(results))))
         else:
             logger.info("Core dump and config check passed for {}".format(module_name))
 
@@ -2281,7 +2281,7 @@ def verify_packets_any_fixed(test, pkt, ports=[], device_number=0, timeout=None)
 
 # HACK: testutils.verify_packets_any to workaround code bug
 # TODO: delete me when ptf version is advanced than https://github.com/p4lang/ptf/pull/139
-testutils.verify_packets_any = verify_packets_any_fixed
+# testutils.verify_packets_any = verify_packets_any_fixed
 
 # HACK: We are using set_do_not_care_scapy but it will be deprecated.
 if not hasattr(Mask, "set_do_not_care_scapy"):

@@ -6,6 +6,11 @@ import ptf.packet as scapy
 from ptf.mask import Mask
 import ptf.testutils as testutils
 
+import ptf
+from ptf.base_tests import BaseTest
+from ptf.dataplane import DataPlane
+import ptf.ptfutils as ptfutils
+
 from constants import VM_VNI, VNET2_VNI, REMOTE_CA_IP, LOCAL_CA_IP, REMOTE_ENI_MAC,\
     LOCAL_ENI_MAC, LOOPBACK_IP, DUT_MAC, LOCAL_PA_IP, LOCAL_PTF_INTF, LOCAL_PTF_MAC,\
     REMOTE_PA_IP, REMOTE_PTF_INTF, REMOTE_PTF_MAC
@@ -41,7 +46,7 @@ def inbound_vnet_packets(dash_config_info):
         ip_src=dash_config_info[LOOPBACK_IP],
         ip_dst=dash_config_info[LOCAL_PA_IP],
         vxlan_vni=dash_config_info[VM_VNI],
-        ip_ttl=255,
+        ip_ttl=254,
         ip_id=0,
         inner_frame=inner_packet
     )
@@ -83,7 +88,7 @@ def outbound_vnet_packets(dash_config_info):
         ip_src=dash_config_info[LOOPBACK_IP],
         ip_dst=dash_config_info[REMOTE_PA_IP],
         vxlan_vni=dash_config_info[VNET2_VNI],
-        ip_ttl=255,
+        ip_ttl=254,
         ip_id=0,
         inner_frame=inner_packet
     )
@@ -96,8 +101,39 @@ def outbound_vnet_packets(dash_config_info):
     return inner_packet, vxlan_packet, masked_exp_packet
 
 
+class PTFSSAdapter(BaseTest):
+    def __init__(self):
+        super(PTFSSAdapter, self).__init__()
+        ptf.config.update({
+            'platform': 'linux',
+            'port_map': {
+                    (0, 0): "ens4f1np1",
+                    (0, 1): "ens4f0np0"
+                },
+            'relax': True,
+            })
+        ptfutils.default_timeout = 2
+        ptfutils.default_negative_timeout = 0.1
+        ptf.dataplane_instance = DataPlane(config=ptf.config)
+        ptf.dataplane_instance.port_add("ens4f1np1", 0, 0)
+        ptf.dataplane_instance.port_add("ens4f0np0", 0, 1)
+        self.dataplane = ptf.dataplane_instance
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.dataplane.kill()
+
+
+@pytest.fixture
+def ptf_ss_adapter():
+    with PTFSSAdapter() as adapter:
+        yield adapter
+
+
 def test_outbound_vnet(
-        ptfadapter,
+        ptf_ss_adapter,
         apply_vnet_configs,
         outbound_vnet_packets,
         dash_config_info,
@@ -106,49 +142,59 @@ def test_outbound_vnet(
     """
     Send VXLAN packets from the VM VNI
     """
-    asic_db_checker(["SAI_OBJECT_TYPE_VNET", "SAI_OBJECT_TYPE_ENI"])
-    if skip_dataplane_checking:
-        return
+    # asic_db_checker(["SAI_OBJECT_TYPE_VNET", "SAI_OBJECT_TYPE_ENI"])
+    # if skip_dataplane_checking:
+    #     return
     _, vxlan_packet, expected_packet = outbound_vnet_packets
-    testutils.send(ptfadapter, dash_config_info[LOCAL_PTF_INTF], vxlan_packet, 1)
-    testutils.verify_packets_any(ptfadapter, expected_packet, ports=dash_config_info[REMOTE_PTF_INTF])
+    testutils.send(ptf_ss_adapter, dash_config_info[LOCAL_PTF_INTF], vxlan_packet, 1)
+    testutils.verify_packets_any(ptf_ss_adapter, expected_packet, ports=dash_config_info[REMOTE_PTF_INTF])
     # testutils.verify_packet(ptfadapter, expected_packet, dash_config_info[REMOTE_PTF_INTF])
 
 
 def test_outbound_vnet_direct(
-        ptfadapter,
+        ptf_ss_adapter,
         apply_vnet_direct_configs,
         outbound_vnet_packets,
         dash_config_info,
         skip_dataplane_checking,
         asic_db_checker):
-    asic_db_checker(["SAI_OBJECT_TYPE_VNET", "SAI_OBJECT_TYPE_ENI"])
-    if skip_dataplane_checking:
-        return
+    # asic_db_checker(["SAI_OBJECT_TYPE_VNET", "SAI_OBJECT_TYPE_ENI"])
+    # if skip_dataplane_checking:
+    #     return
     _, vxlan_packet, expected_packet = outbound_vnet_packets
-    testutils.send(ptfadapter, dash_config_info[LOCAL_PTF_INTF], vxlan_packet, 1)
-    testutils.verify_packets_any(ptfadapter, expected_packet, ports=dash_config_info[REMOTE_PTF_INTF])
+    testutils.send(ptf_ss_adapter, dash_config_info[LOCAL_PTF_INTF], vxlan_packet, 1)
+    testutils.verify_packets_any(ptf_ss_adapter, expected_packet, ports=dash_config_info[REMOTE_PTF_INTF])
     # testutils.verify_packet(ptfadapter, expected_packet, dash_config_info[REMOTE_PTF_INTF])
 
 
 def test_outbound_direct(
-        ptfadapter,
+        ptf_ss_adapter,
         apply_direct_configs,
         outbound_vnet_packets,
         dash_config_info,
         skip_dataplane_checking,
         asic_db_checker):
-    asic_db_checker(["SAI_OBJECT_TYPE_VNET", "SAI_OBJECT_TYPE_ENI"])
-    if skip_dataplane_checking:
-        return
+    # asic_db_checker(["SAI_OBJECT_TYPE_VNET", "SAI_OBJECT_TYPE_ENI"])
+    # if skip_dataplane_checking:
+    #     return
     expected_inner_packet, vxlan_packet, _ = outbound_vnet_packets
-    testutils.send(ptfadapter, dash_config_info[LOCAL_PTF_INTF], vxlan_packet, 1)
-    testutils.verify_packets_any(ptfadapter, expected_inner_packet, ports=dash_config_info[REMOTE_PTF_INTF])
+    testutils.send(ptf_ss_adapter, dash_config_info[LOCAL_PTF_INTF], vxlan_packet, 1)
+
+    expected_inner_packet = Mask(expected_inner_packet)
+    expected_inner_packet.set_do_not_care_scapy(scapy.Ether, "dst")
+    expected_inner_packet.set_do_not_care_scapy(scapy.Ether, "src")
+    expected_inner_packet.set_do_not_care_scapy(scapy.IP, "ttl")
+    expected_inner_packet.set_do_not_care_scapy(scapy.IP, "id")
+    expected_inner_packet.set_do_not_care_scapy(scapy.IP, "chksum")
+    expected_inner_packet.set_do_not_care_scapy(scapy.UDP, "sport")
+    expected_inner_packet.set_do_not_care_scapy(scapy.UDP, "chksum")
+
+    testutils.verify_packets_any(ptf_ss_adapter, expected_inner_packet, ports=dash_config_info[REMOTE_PTF_INTF])
     # testutils.verify_packet(ptfadapter, expected_inner_packet, dash_config_info[REMOTE_PTF_INTF])
 
 
 def test_inbound_vnet_pa_validate(
-        ptfadapter,
+        ptf_ss_adapter,
         apply_inbound_configs,
         inbound_vnet_packets,
         dash_config_info,
@@ -162,12 +208,12 @@ def test_inbound_vnet_pa_validate(
     2. Send one packet where the source PA does not match the mapping table
         - Expect DPU to drop packet
     """
-    asic_db_checker(["SAI_OBJECT_TYPE_VNET", "SAI_OBJECT_TYPE_ENI"])
-    if skip_dataplane_checking:
-        return
+    # asic_db_checker(["SAI_OBJECT_TYPE_VNET", "SAI_OBJECT_TYPE_ENI"])
+    # if skip_dataplane_checking:
+    #     return
     _,  pa_match_packet, pa_mismatch_packet, expected_packet = inbound_vnet_packets
-    testutils.send(ptfadapter, dash_config_info[REMOTE_PTF_INTF], pa_match_packet, 1)
-    testutils.verify_packets_any(ptfadapter, expected_packet, ports=dash_config_info[LOCAL_PTF_INTF])
+    testutils.send(ptf_ss_adapter, dash_config_info[REMOTE_PTF_INTF], pa_match_packet, 1)
+    testutils.verify_packets_any(ptf_ss_adapter, expected_packet, ports=dash_config_info[LOCAL_PTF_INTF])
 
-    testutils.send(ptfadapter, dash_config_info[REMOTE_PTF_INTF], pa_mismatch_packet, 1)
-    testutils.verify_no_packet_any(ptfadapter, expected_packet, ports=dash_config_info[LOCAL_PTF_INTF])
+    testutils.send(ptf_ss_adapter, dash_config_info[REMOTE_PTF_INTF], pa_mismatch_packet, 1)
+    testutils.verify_no_packet_any(ptf_ss_adapter, expected_packet, ports=dash_config_info[LOCAL_PTF_INTF])

@@ -336,3 +336,18 @@
   inv_name: veos_vtb
   auto_recover: False
   comment: Tests virtual switch vm as DPU
+
+- conf-name: vms-smartswitch
+  group-name: vms6-1
+  topo: smartswitch
+  ptf_image_name: docker-ptf
+  ptf: ptf_smartswitch
+  ptf_ip: 192.168.101.80/24
+  ptf_ipv6: fec0::ffff:afa:2/64
+  server: server_1
+  vm_base: VM0100
+  dut:
+    - smartswitch-01
+  inv_name: veos_vtb
+  auto_recover: False
+  comment: Tests virtual switch vm as DPU

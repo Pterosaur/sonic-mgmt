@@ -47,6 +47,7 @@ all:
           - wan-ecmp
           - wan-pub-isis
           - dpu
+          - smartswitch
       children:
         server_1:
     lab:
@@ -64,6 +65,7 @@ all:
         vlab-11:
         vlab-12:
         vlab-8k-01:
+        smartswitch-01:
     ptf:
       hosts:
         ptf-01:
@@ -90,9 +92,11 @@ all:
         ptf-08:
           ansible_host: 10.250.0.119
           ansible_hostv6: fec0::ffff:afb:5
+        ptf_smartswitch:
+          ansible_host: 192.168.101.80
       vars:
-          ansible_user: root
-          ansible_password: root
+          ansible_user: ssproto
+          ansible_password: w3cAm3w3sAw
     sonic:
       vars:
         mgmt_subnet_mask_length: 24
@@ -258,6 +262,9 @@ all:
           # sdk/npsuite override:
           #cisco_sdk_ver: "1.50.10.4.22"
           #cisco_npsuite_ver: "1.90.0"
+        smartswitch-01:
+          ansible_host: 192.168.101.50
+
 
 
 # The groups below are helpers to limit running playbooks to a specific server only
@@ -273,7 +280,7 @@ vm_host_1:
     STR-ACS-VSERV-01:
       ansible_host: 172.17.0.1
       ansible_user: use_own_value
-      vm_host_user: use_own_value
+      vm_host_user: ssproto
 
 vms_1:
   hosts:

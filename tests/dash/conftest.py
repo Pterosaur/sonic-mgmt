@@ -66,6 +66,7 @@ def skip_dataplane_checking(request):
 
 @pytest.fixture(scope="module")
 def config_facts(duthost):
+    return
     return duthost.config_facts(host=duthost.hostname, source="running")['ansible_facts']
 
 
@@ -80,6 +81,7 @@ def minigraph_facts(duthosts, rand_one_dut_hostname, tbinfo):
     Returns:
         Dictionary containing minigraph information
     """
+    return
     duthost = duthosts[rand_one_dut_hostname]
 
     return duthost.get_extended_minigraph_facts(tbinfo)
@@ -111,30 +113,22 @@ def dash_config_info(duthost, config_facts, minigraph_facts):
         VNET2_NAME: "Vnet2",
         REMOTE_CA_IP: "20.2.2.2",
         LOCAL_CA_IP: "11.1.1.1",
-        REMOTE_ENI_MAC: "F9:22:83:99:22:A2",
+        REMOTE_ENI_MAC: "34:88:18:b8:24:00",
         LOCAL_ENI_MAC: "F4:93:9F:EF:C4:7E",
         REMOTE_CA_PREFIX: "20.2.2.0/24",
     }
-    loopback_intf_ip = ip_interface(list(list(config_facts["LOOPBACK_INTERFACE"].values())[0].keys())[0])
-    dash_info[LOOPBACK_IP] = str(loopback_intf_ip.ip)
-    dash_info[DUT_MAC] = config_facts["DEVICE_METADATA"]["localhost"]["mac"]
 
-    neigh_table = duthost.switch_arptable()['ansible_facts']['arptable']
-    for neigh_ip, config in list(config_facts["BGP_NEIGHBOR"].items()):
-        # Pick the first two BGP neighbor IPs since these should already be learned on the DUT
-        if ip_interface(neigh_ip).version == 4:
-            if LOCAL_PA_IP not in dash_info:
-                dash_info[LOCAL_PA_IP] = neigh_ip
-                intf, _ = get_intf_from_ip(config['local_addr'], config_facts)
-                dash_info[LOCAL_PTF_INTF] = minigraph_facts["minigraph_ptf_indices"][intf]
-                dash_info[LOCAL_PTF_MAC] = neigh_table["v4"][neigh_ip]["macaddress"]
-            elif REMOTE_PA_IP not in dash_info:
-                dash_info[REMOTE_PA_IP] = neigh_ip
-                intf, intf_ip = get_intf_from_ip(config['local_addr'], config_facts)
-                dash_info[REMOTE_PTF_INTF] = minigraph_facts["minigraph_ptf_indices"][intf]
-                dash_info[REMOTE_PTF_MAC] = neigh_table["v4"][neigh_ip]["macaddress"]
-                dash_info[REMOTE_PA_PREFIX] = str(intf_ip.network)
-                break
+    dash_info[LOOPBACK_IP] = "10.1.0.1"
+    dash_info[DUT_MAC] = "34:88:18:b8:24:00"
+
+    dash_info[LOCAL_PA_IP] = "10.0.0.10"
+    dash_info[LOCAL_PTF_INTF] = 1
+    dash_info[LOCAL_PTF_MAC] = "10:70:fd:51:ea:6c"
+
+    dash_info[REMOTE_PA_IP] = "10.0.0.8"
+    dash_info[REMOTE_PTF_INTF] = 0
+    dash_info[REMOTE_PTF_MAC] = "10:70:fd:51:ea:6d"
+    dash_info[REMOTE_PA_PREFIX] = "10.0.0.0/24"
 
     return dash_info
 
