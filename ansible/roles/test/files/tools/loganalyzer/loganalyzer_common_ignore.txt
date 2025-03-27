@@ -356,3 +356,16 @@ r, ".* ERR gbsyncd#syncd: /arsonic/packages/broncos-sai/build/PAI_\d+\.\d+/src/b
 
 # Ignore SAI_NEXT_HOP_GROUP_ATTR_TYPE unsupported
 r, ".* ERR swss#orchagent:.*queryAttributeEnumValuesCapability:.*returned value \d+ is not allowed on SAI_NEXT_HOP_GROUP_ATTR_TYPE"
+# Ignore flex counter error on TH5 platform temporarily
+r, ".*ERR syncd#syncd: :- collectData: Failed to get stats of Port Counter.*"
+
+# Ignore VDM failures on mellanox platform on the branch 202412.08
+r, ".*ERR pmon#xcvrd\[\d+\]: DOM-INFO-UPDATE: Failed to freeze VDM stats for port \d+.*"
+r, ".*ERR pmon#xcvrd\[\d+\]: Failed to confirm VDM unfreeze status for port \d+.*"
+r, ".*ERR pmon#xcvrd\[\d+\]: Failed to unfreeze VDM stats in contextmanager for port \d+.*"
+r, ".*ERR pmon#xcvrd\[\d+\]: Failed to confirm VDM freeze status for port \d+.*"
+r, ".*ERR pmon#xcvrd\[\d+\]: Failed to freeze VDM stats in contextmanager for port \d+.*"
+r, ".*ERR pmon#xcvrd\[\d+\]: DOM-INFO-UPDATE: Failed to freeze VDM stats for port \d+.*"
+
+# Ignore all VDM-related failures on Mellanox platform on the branch 202412.08
+r, ".*ERR pmon#xcvrd\[\d+\]: .*VDM.*"
