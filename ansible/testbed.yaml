@@ -2172,7 +2172,7 @@
   auto_recover: 'True'
   comment: janetcui
 
-- conf-name: vms73-t0-sn5600-5
+- conf-name: vms73-t1-sn5600-5
   group-name: vms71-5
   topo: t1-isolated-v6-d28u1
   ptf_image_name: docker-ptf
