@@ -369,3 +369,6 @@ r, ".*ERR pmon#xcvrd\[\d+\]: DOM-INFO-UPDATE: Failed to freeze VDM stats for por
 
 # Ignore all VDM-related failures on Mellanox platform on the branch 202412.08
 r, ".*ERR pmon#xcvrd\[\d+\]: .*VDM.*"
+
+# Ignore PFC Watchdog start failures on Ethernet ports
+r, ".*ERR swss#orchagent: :- createEntry: Failed to start PFC Watchdog on port Ethernet\d+.*"
