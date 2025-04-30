@@ -2306,9 +2306,6 @@ snmp/test_snmp_phy_entity.py:
     reason: "Only supports physical testbed."
     conditions:
       - "asic_type in ['vs']"
-    reason: "Skipped on isolated topology due to missing 'is_replaceable' field, GitHub issue:https://github.com/sonic-net/sonic-buildimage/issues/22150"
-    conditions:
-      - "'isolated' in topo_name"
 
 snmp/test_snmp_queue.py:
   skip:
