@@ -2303,10 +2303,11 @@ snmp/test_snmp_pfc_counters.py:
 
 snmp/test_snmp_phy_entity.py:
   skip:
-    reason: "Only supports physical testbed."
+    reason: "1. Only supports physical testbed.
+             2. Skipped on isolated topology due to missing 'is_replaceable' field, GitHub issue:https://github.com/sonic-net/sonic-buildimage/issues/22150"
     conditions:
       - "asic_type in ['vs']"
-
+      - "'isolated' in topo_name"
 snmp/test_snmp_queue.py:
   skip:
     reason: "Interfaces not present on supervisor node or M0/MX topo does not support test_snmp_queue or unsupported platform"
