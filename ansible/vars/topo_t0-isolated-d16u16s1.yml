@@ -81,6 +81,10 @@ topology:
       vlans:
         - 216
       vm_offset: 15
+    ARISTA01PT0:
+      vlans:
+        - 256
+      vm_offset: 16
   DUT:
     vlan_configs:
       default_vlan_config: one_vlan_a
@@ -452,3 +456,22 @@ configuration:
     bp_interface:
       ipv4: 10.10.246.218/24
       ipv6: fc0a::da/64
+  ARISTA01PT0:
+    properties:
+    - common
+    bgp:
+      asn: 65100
+      peers:
+        65100:
+          - 10.0.2.0
+          - fc00::401
+    interfaces:
+      Loopback0:
+        ipv4: 100.1.1.1/32
+        ipv6: 2064:100:0:101::/128
+      Ethernet1:
+        ipv4: 10.0.2.1/31
+        ipv6: fc00::402/126
+    bp_interface:
+      ipv4: 10.10.247.2/24
+      ipv6: fc0a::102/64
