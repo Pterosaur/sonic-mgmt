@@ -144,6 +144,10 @@ topology:
       vlans:
         - 408
       vm_offset: 27
+    ARISTA225T1:
+      vlans:
+        - 416
+      vm_offset: 28
     ARISTA233T1:
       vlans:
         - 424
@@ -763,6 +767,25 @@ configuration:
     bp_interface:
       ipv4: 10.10.247.154/24
       ipv6: fc0a::19a/64
+  ARISTA225T1:
+    properties:
+    - common
+    bgp:
+      asn: 64629
+      peers:
+        65100:
+          - 10.0.3.64
+          - fc00::681
+    interfaces:
+      Loopback0:
+        ipv4: 100.1.1.161/32
+        ipv6: 2064:100:0:1a1::/128
+      Ethernet1:
+        ipv4: 10.0.3.65/31
+        ipv6: fc00::682/126
+    bp_interface:
+      ipv4: 10.10.247.162/24
+      ipv6: fc0a::1a2/64
   ARISTA233T1:
     properties:
     - common
