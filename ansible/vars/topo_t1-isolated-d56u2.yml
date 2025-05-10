@@ -224,10 +224,6 @@ topology:
       vlans:
         - 440
       vm_offset: 55
-    ARISTA433T0:
-      vlans:
-        - 448
-      vm_offset: 56
     ARISTA441T0:
       vlans:
         - 456
@@ -1424,27 +1420,6 @@ configuration:
     bp_interface:
       ipv4: 10.10.247.186/24
       ipv6: fc0a::1ba/64
-  ARISTA433T0:
-    properties:
-    - common
-    - tor
-    tornum: 55
-    bgp:
-      asn: 64055
-      peers:
-        65100:
-          - 10.0.3.128
-          - fc00::701
-    interfaces:
-      Loopback0:
-        ipv4: 100.1.1.193/32
-        ipv6: 2064:100:0:1c1::/128
-      Ethernet1:
-        ipv4: 10.0.3.129/31
-        ipv6: fc00::702/126
-    bp_interface:
-      ipv4: 10.10.247.194/24
-      ipv6: fc0a::1c2/64
   ARISTA441T0:
     properties:
     - common
