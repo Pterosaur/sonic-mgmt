@@ -50,31 +50,27 @@ parameters:
   type: boolean
   displayName: "Skip post upgrade actions"
 
-- name: RUN_ASIC_DB_ASIC_SAI_CONSISTENCY_CHECKER
-  default: true
-  type: boolean
-  displayName: "Run ASIC DB and ASIC SAI consistency checker after upgrade"
-
 - name: METADATA_UPGRADE_PATH
   default: true
   type: boolean
-  displayName: "Use sonic-metadata scripts for image download, installation, and postupgrade"
 
-- name: RUN_REBOOT_CASE
-  default: "test_upgrade_path"
+- name: SKIP_REBOOT_CASES
+  default: "test_cancelled_upgrade_path test_warm_upgrade_sad_path test_double_upgrade_path"
   type: string
-  displayName: "Case to run"
+  displayName: "Cases to skip running"
   values:
   - test_upgrade_path
-  - test_upgrade_path_t2
   - test_warm_upgrade_sad_path
   - test_cancelled_upgrade_path
-  - test_double_upgrade_path
+  - test_cancelled_upgrade_path test_upgrade_path
+  - test_cancelled_upgrade_path test_upgrade_path test_double_upgrade_path
+  - test_cancelled_upgrade_path test_warm_upgrade_sad_path test_upgrade_path
+  - test_cancelled_upgrade_path test_warm_upgrade_sad_path test_double_upgrade_path
+  - " "
 
 - name: SELECT_SAD_CASES
   default: "sad,multi_sad,sad_bgp,sad_lag_member,sad_lag,sad_vlan_port,sad_inboot"
   type: string
-  displayName: "SAD cases to run (only applies for test_warm_upgrade_sad_path)"
 
 - name: TEST_TCAM_HOLE
   default: false
@@ -117,7 +113,6 @@ parameters:
   - $(IMAGE_BRCM_ABOOT_202311_SLIM)
   - $(IMAGE_BRCM_ABOOT_202405)
   - $(IMAGE_BRCM_ABOOT_202405_SLIM)
-  - $(IMAGE_BRCM_ABOOT_202411)
   - $(IMAGE_BRCM_ABOOT_INTERNAL)
   - $(IMAGE_BRCM_ABOOT_PUBLIC)
   - $(IMAGE_CISCO_202012)
@@ -125,56 +120,33 @@ parameters:
   - $(IMAGE_CISCO_202305)
   - $(IMAGE_CISCO_202311)
   - $(IMAGE_CISCO_202405)
-  - $(IMAGE_CISCO_202411)
   - $(BJW_IMAGE_CISCO_202305)
   - $(BJW_IMAGE_CISCO_202311)
-  - $(BJW_IMAGE_CISCO_202405)
-  - $(BJW_IMAGE_CISCO_202411)
   - $(IMAGE_CISCO_ABOOT_202012)
   - $(IMAGE_CISCO_ABOOT_202205)
-  - $(IMAGE_CISCO_CHASSIS_202405)
   - $(IMAGE_MLNX_201811)
   - $(IMAGE_MLNX_201911)
   - $(IMAGE_MLNX_202012)
   - $(IMAGE_MLNX_202205)
   - $(IMAGE_MLNX_202305)
   - $(IMAGE_MLNX_202311)
-  - $(IMAGE_MLNX_202405)
-  - $(IMAGE_MLNX_202411)
-  - $(IMAGE_MLNX_202412_TAG)
   - $(IMAGE_MLNX_INTERNAL)
   - $(IMAGE_MLNX_PUBLIC)
   - $(IMAGE_MARVELL_202012)
   - $(IMAGE_MARVELL_202205)
   - $(IMAGE_MARVELL_202305)
   - $(IMAGE_MARVELL_202311)
-  - $(IMAGE_MARVELL_202405)
-  - $(IMAGE_MARVELL_202411)
   - $(IMAGE_MARVELL_PUBLIC)
   - $(BJW_IMAGE_BRCM_201811)
   - $(BJW_IMAGE_BRCM_202012_SLIM)
   - $(BJW_IMAGE_BRCM_202305_SLIM)
-  - $(BJW_IMAGE_MLNX_201811)
   - $(BJW_IMAGE_MLNX_201911)
-  - $(BJW_IMAGE_MLNX_202012)
-  - $(BJW_IMAGE_MLNX_202205)
-  - $(BJW_IMAGE_MLNX_202305)
-  - $(BJW_IMAGE_MLNX_202311)
-  - $(BJW_IMAGE_MLNX_202405)
-  - $(BJW_IMAGE_MLNX_202411)
-  - $(BJW_IMAGE_MLNX_202412_TAG)
   - $(BJW_IMAGE_BRCM_ABOOT_202305)
   - $(BJW_IMAGE_BRCM_ABOOT_202311)
   - $(BJW_IMAGE_BRCM_ABOOT_202405)
-  - $(BJW_IMAGE_BRCM_ABOOT_202411)
   - $(BJW_IMAGE_MARVELL_202305)
   - $(BJW_IMAGE_MARVELL_202311)
   - $(BJW_IMAGE_MARVELL_202405)
-  - $(BJW_IMAGE_MARVELL_202411)
-  - $(IMAGE_BRCM_DNX_CHASSIS_202205)
-  - $(IMAGE_BRCM_DNX_CHASSIS_202405)
-  - $(BJW_IMAGE_BRCM_DNX_CHASSIS_202205)
-  - $(BJW_IMAGE_BRCM_DNX_CHASSIS_202405)
   - custom
 
 - name: TO_IMAGE_LIST
@@ -209,7 +181,6 @@ parameters:
   - $(IMAGE_BRCM_ABOOT_202311_SLIM)
   - $(IMAGE_BRCM_ABOOT_202405)
   - $(IMAGE_BRCM_ABOOT_202405_SLIM)
-  - $(IMAGE_BRCM_ABOOT_202411)
   - $(IMAGE_BRCM_ABOOT_INTERNAL)
   - $(IMAGE_BRCM_ABOOT_PUBLIC)
   - $(IMAGE_CISCO_202012)
@@ -217,11 +188,8 @@ parameters:
   - $(IMAGE_CISCO_202305)
   - $(IMAGE_CISCO_202311)
   - $(IMAGE_CISCO_202405)
-  - $(IMAGE_CISCO_202411)
   - $(BJW_IMAGE_CISCO_202305)
   - $(BJW_IMAGE_CISCO_202311)
-  - $(BJW_IMAGE_CISCO_202405)
-  - $(BJW_IMAGE_CISCO_202411)
   - $(IMAGE_CISCO_ABOOT_202012)
   - $(IMAGE_CISCO_ABOOT_202205)
   - $(IMAGE_MLNX_201811)
@@ -230,42 +198,23 @@ parameters:
   - $(IMAGE_MLNX_202205)
   - $(IMAGE_MLNX_202305)
   - $(IMAGE_MLNX_202311)
-  - $(IMAGE_MLNX_202405)
-  - $(IMAGE_MLNX_202411)
-  - $(IMAGE_MLNX_202412_TAG)
   - $(IMAGE_MLNX_INTERNAL)
   - $(IMAGE_MLNX_PUBLIC)
   - $(IMAGE_MARVELL_202012)
   - $(IMAGE_MARVELL_202205)
   - $(IMAGE_MARVELL_202305)
   - $(IMAGE_MARVELL_202311)
-  - $(IMAGE_MARVELL_202405)
-  - $(IMAGE_MARVELL_202411)
   - $(IMAGE_MARVELL_PUBLIC)
   - $(BJW_IMAGE_BRCM_201811)
   - $(BJW_IMAGE_BRCM_202012_SLIM)
   - $(BJW_IMAGE_BRCM_202305_SLIM)
-  - $(BJW_IMAGE_MLNX_201811)
-  - $(BJW_IMAGE_MLNX_201911)
-  - $(BJW_IMAGE_MLNX_202012)
   - $(BJW_IMAGE_MLNX_202205)
-  - $(BJW_IMAGE_MLNX_202305)
-  - $(BJW_IMAGE_MLNX_202311)
-  - $(BJW_IMAGE_MLNX_202405)
-  - $(BJW_IMAGE_MLNX_202411)
-  - $(BJW_IMAGE_MLNX_202412_TAG)
   - $(BJW_IMAGE_BRCM_ABOOT_202305)
   - $(BJW_IMAGE_BRCM_ABOOT_202311)
   - $(BJW_IMAGE_BRCM_ABOOT_202405)
-  - $(BJW_IMAGE_BRCM_ABOOT_202411)
   - $(BJW_IMAGE_MARVELL_202305)
   - $(BJW_IMAGE_MARVELL_202311)
   - $(BJW_IMAGE_MARVELL_202405)
-  - $(BJW_IMAGE_MARVELL_202411)
-  - $(IMAGE_BRCM_DNX_CHASSIS_202205)
-  - $(IMAGE_BRCM_DNX_CHASSIS_202405)
-  - $(BJW_IMAGE_BRCM_DNX_CHASSIS_202205)
-  - $(BJW_IMAGE_BRCM_DNX_CHASSIS_202405)
   - custom
 
 - name: VSONIC_NEIGHBOR_IMAGE_URL
@@ -280,11 +229,9 @@ parameters:
   - "1"
   - "10"
   - "16"
-  - "17"
   - "18"
   - "20"
   - "22"
-  - "27"
   - "100"
   - "500"
 
@@ -321,14 +268,12 @@ stages:
     UPGRADE_TYPE: ${{ parameters.UPGRADE_TYPE }}
     VM_TYPE: ${{ parameters.VM_TYPE }}
     SKIP_POSTUPGRADE_ACTIONS: ${{ parameters.SKIP_POSTUPGRADE_ACTIONS }}
-    RUN_ASIC_DB_ASIC_SAI_CONSISTENCY_CHECKER: ${{ parameters.RUN_ASIC_DB_ASIC_SAI_CONSISTENCY_CHECKER }}
-    METADATA_UPGRADE_PATH: ${{ parameters.METADATA_UPGRADE_PATH }}
     FROM_IMAGE_LIST: ${{ parameters.FROM_IMAGE_LIST }}
     FROM_IMAGE_URL: ${{ parameters.FROM_IMAGE_URL }}
     TO_IMAGE_LIST: ${{ parameters.TO_IMAGE_LIST }}
     TO_IMAGE_URL: ${{ parameters.TO_IMAGE_URL }}
     VSONIC_NEIGHBOR_IMAGE_URL: ${{ parameters.VSONIC_NEIGHBOR_IMAGE_URL }}
-    RUN_REBOOT_CASE: ${{ parameters.RUN_REBOOT_CASE }}
+    SKIP_REBOOT_CASES: ${{ parameters.SKIP_REBOOT_CASES }}
     SELECT_SAD_CASES: ${{ parameters.SELECT_SAD_CASES }}
     ITERATIONS : ${{ parameters.ITERATIONS }}
     SKIP_TEST_RESULTS_UPLOADING: ${{ parameters.SKIP_TEST_RESULTS_UPLOADING }}
