@@ -1393,20 +1393,6 @@ everflow/test_everflow_per_interface.py::test_everflow_packet_format[ipv6-m0_vla
       - "platform in ['x86_64-8800_lc_48h_o-r0', 'x86_64-8800_lc_48h-r0']"
       - "(is_multi_asic==True) and https://github.com/sonic-net/sonic-buildimage/issues/11776"
 
-everflow/test_everflow_per_interface.py::test_everflow_per_interface[ipv4-erspan:
-  skip:
-    reason: "Skip for IPv6-only topologies"
-    conditions:
-      - "'-v6-' in topo_name"
-
-everflow/test_everflow_per_interface.py::test_everflow_per_interface[ipv4-erspan_ipv6-default]:
-  skip:
-    reason: "SAI_STATUS_NOT_SUPPORTED for everflow over IPv6 on Arista-7260CX3 and Arista-7060CX"
-    conditions_logical_operator: and
-    conditions:
-      - "https://github.com/sonic-net/sonic-mgmt/issues/19096"
-      - "platform in ['x86_64-arista_7260cx3_64', 'x86_64-arista_7060_cx32s']"
-
 everflow/test_everflow_per_interface.py::test_everflow_per_interface[ipv6-erspan:
   skip:
     reason: "Skip everflow per interface IPv6 test on unsupported platforms"
