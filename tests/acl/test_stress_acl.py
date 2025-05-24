@@ -5,6 +5,7 @@ import json
 import ptf.testutils as testutils
 from ptf import mask, packet
 from collections import defaultdict
+from ipaddress import ip_address, IPv4Address
 from tests.common.dualtor.mux_simulator_control import toggle_all_simulator_ports_to_rand_selected_tor  # noqa F401
 from tests.common.utilities import wait_until
 
@@ -110,16 +111,21 @@ def prepare_test_port(rand_selected_dut, tbinfo):
     # Get the list of upstream ports
     upstream_ports = defaultdict(list)
     upstream_port_ids = []
+    upstream_port_neighbor_ips = {}
     for interface, neighbor in list(mg_facts["minigraph_neighbors"].items()):
         port_id = mg_facts["minigraph_ptf_indices"][interface]
         if (topo == "t1" and "T2" in neighbor["name"]) or (topo == "t0" and "T1" in neighbor["name"]) or \
                 (topo == "m0" and "M1" in neighbor["name"]) or (topo == "mx" and "M0" in neighbor["name"]):
             upstream_ports[neighbor['namespace']].append(interface)
             upstream_port_ids.append(port_id)
+            ipv4_addr = [bgp_neighbor['addr'] for bgp_neighbor in mg_facts['minigraph_bgp']
+                         if bgp_neighbor['name'] == neighbor["name"] and
+                         isinstance(ip_address(bgp_neighbor['addr']), IPv4Address)][0]
+            upstream_port_neighbor_ips[interface] = ipv4_addr
 
     dst_ip_addr = None
-    if tbinfo["topo"]['name'] == "t1-isolated-d28u1":
-        dst_ip_addr = "10.0.0.2"
+    if tbinfo["topo"]['name'] in ["t1-isolated-d28u1", "t1-isolated-d56u2", "t1-isolated-d448u16"]:
+        dst_ip_addr = random.choices(list(upstream_port_neighbor_ips.values()))
     return ptf_src_port, upstream_port_ids, dut_port, dst_ip_addr
 
 

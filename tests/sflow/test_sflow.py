@@ -19,6 +19,7 @@ from tests.common import config_reload
 from tests.common.utilities import wait_until
 from tests.common.utilities import get_upstream_neigh_type
 from tests.common.utilities import get_neighbor_port_list
+from tests.common.helpers.assertions import pytest_assert
 
 SFLOW_RATE_DEFAULT = 512
 
@@ -66,7 +67,8 @@ def setup(duthosts, rand_one_dut_hostname, ptfhost, tbinfo, config_sflow_feature
     else:
         for port_channel, interfaces in list(mg_facts['minigraph_portchannels'].items()):
             upstream_ports.extend(interfaces['members'])
-
+    pytest_assert(len(upstream_ports) > 0, 'No upstream ports found, please, please double confirm the logic of '
+                                           'preparing setup')
     for port in upstream_ports:
         var['sflow_ports'][port] = {}
         var['sflow_ports'][port]['ifindex'] = get_ifindex(duthost, port)
