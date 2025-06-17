@@ -358,6 +358,9 @@ r, ".* ERR gbsyncd#syncd: /arsonic/packages/broncos-sai/build/PAI_\d+\.\d+/src/b
 r, ".* ERR swss#orchagent:.*queryAttributeEnumValuesCapability:.*returned value \d+ is not allowed on SAI_NEXT_HOP_GROUP_ATTR_TYPE"
 # Ignore flex counter error on TH5 platform temporarily
 r, ".*ERR syncd#syncd: :- collectData: Failed to get stats of Port Counter.*"
+# Ignore unsupported enumerated attribute
+r, ".*ERR swss#orchagent: :- queryAttributeEnumValuesCapability: returned value \d+ is not allowed on SAI_SWITCH_ATTR_ECMP_DEFAULT_HASH_ALGORITHM.*"
+r, ".*ERR swss#orchagent: :- queryTrimModeEnumCapabilities: Failed to get attribute\(SAI_SWITCH_ATTR_PACKET_TRIM_QUEUE_RESOLUTION_MODE\) enum value capabilities"
 
 # Ignore VDM failures on mellanox platform on the branch 202412.08
 r, ".*ERR pmon#xcvrd\[\d+\]: DOM-INFO-UPDATE: Failed to freeze VDM stats for port \d+.*"
