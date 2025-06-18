@@ -39,8 +39,7 @@ from ptf.testutils import send_packet
 from ptf.testutils import verify_packet_any_port
 from ptf.testutils import verify_no_packet_any
 
-from collections import defaultdict
-from collections.abc import Iterable
+from collections import Iterable, defaultdict
 
 
 class FibTest(BaseTest):
