@@ -20,7 +20,8 @@ DST_IPV6_RANGE = ['20D0:A800:0:01::', '20D0:FFFF:0:01::FFFF']
 IP_RANGE = {'ipv4': {'src': SRC_IP_RANGE, 'dst': DST_IP_RANGE},
             'ipv6': {'src': SRC_IPV6_RANGE, 'dst': DST_IPV6_RANGE},
             'None': {'src': [], 'dst': []}}
-PTF_QLEN = 20000
+PTF_QLEN = 2000000
+SOCKET_RECV_SIZE = 1638400
 VLAN_RANGE = [1032, 1060]
 ETHERTYPE_RANGE = [0x0801, 0x0900]
 ENCAPSULATION = ['ipinip', 'vxlan', 'nvgre']

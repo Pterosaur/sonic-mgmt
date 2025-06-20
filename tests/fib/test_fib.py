@@ -45,7 +45,8 @@ SRC_IPV6_RANGE = ['20D0:A800:0:00::', '20D0:FFFF:0:00::FFFF']
 DST_IPV6_RANGE = ['20D0:A800:0:01::', '20D0:FFFF:0:01::FFFF']
 VLANIDS = list(range(1032, 1279))
 VLANIP = '192.168.{}.1/24'
-PTF_QLEN = 20000
+PTF_QLEN = 2000000
+SOCKET_RECV_SIZE = 1638400
 DEFAULT_MUX_SERVER_PORT = 8080
 
 PTF_TEST_PORT_MAP = '/root/ptf_test_port_map.json'
@@ -127,7 +128,7 @@ def test_basic_fib(duthosts, ptfhost, ipv4, ipv6, mtu,
         },
         log_file=log_file,
         qlen=PTF_QLEN,
-        socket_recv_size=16384,
+        socket_recv_size=SOCKET_RECV_SIZE,
         is_python3=True
     )
 
@@ -355,7 +356,7 @@ def test_hash(add_default_route_to_dut, duthosts, fib_info_files_per_function, s
         },
         log_file=log_file,
         qlen=PTF_QLEN,
-        socket_recv_size=16384,
+        socket_recv_size=SOCKET_RECV_SIZE,
         is_python3=True
     )
 
@@ -398,7 +399,7 @@ def test_ipinip_hash(add_default_route_to_dut, duthost, duthosts, fib_info_files
                        },
                log_file=log_file,
                qlen=PTF_QLEN,
-               socket_recv_size=16384,
+               socket_recv_size=SOCKET_RECV_SIZE,
                is_python3=True)
 
 # The test is to verify the hashing logic is not using unexpected field as keys
@@ -440,7 +441,7 @@ def test_ipinip_hash_negative(add_default_route_to_dut, duthosts, fib_info_files
                },
                log_file=log_file,
                qlen=PTF_QLEN,
-               socket_recv_size=16384,
+               socket_recv_size=SOCKET_RECV_SIZE,
                is_python3=True)
 
 
@@ -492,7 +493,7 @@ def test_vxlan_hash(add_default_route_to_dut, duthost, duthosts, fib_info_files_
                        },
                log_file=log_file,
                qlen=PTF_QLEN,
-               socket_recv_size=16384,
+               socket_recv_size=SOCKET_RECV_SIZE,
                is_python3=True)
 
 
@@ -546,5 +547,5 @@ def test_nvgre_hash(add_default_route_to_dut, duthost, duthosts, fib_info_files_
                        },
                log_file=log_file,
                qlen=PTF_QLEN,
-               socket_recv_size=16384,
+               socket_recv_size=SOCKET_RECV_SIZE,
                is_python3=True)

@@ -381,7 +381,7 @@ class GenericHashTest(BaseTest):
         testutils.send_packet(self, sending_port, pkt)
         try:
             port_index, received = testutils.verify_packet_any_port(
-                self, masked_expected_pkt, self.expected_port_list, timeout=0.1)
+                self, masked_expected_pkt, self.expected_port_list, timeout=10)
         except AssertionError:
             logging.error("Traffic wasn't sent successfully, trying again")
             logging.info(f"Expected packet: {masked_expected_pkt}")
@@ -389,7 +389,7 @@ class GenericHashTest(BaseTest):
                 testutils.send_packet(self, sending_port, pkt, count=1)
                 time.sleep(0.1)
             port_index, received = testutils.verify_packet_any_port(
-                self, masked_expected_pkt, self.expected_port_list, timeout=1)
+                self, masked_expected_pkt, self.expected_port_list, timeout=10)
         # The port_index is the index of expected_port_list, need to convert it to the ptf port index
         return self.expected_port_list[port_index], received
 

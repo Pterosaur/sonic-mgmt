@@ -7,7 +7,7 @@ from tests.common.helpers.assertions import pytest_assert
 from generic_hash_helper import get_hash_fields_from_option, get_ip_version_from_option, get_encap_type_from_option, \
     get_reboot_type_from_option, HASH_CAPABILITIES, check_global_hash_config, startup_interface, \
     get_interfaces_for_test, get_ptf_port_indices, check_default_route, generate_test_params, flap_interfaces, \
-    PTF_QLEN, remove_ip_interface_and_config_vlan, config_custom_vxlan_port, shutdown_interface, \
+    PTF_QLEN, SOCKET_RECV_SIZE, remove_ip_interface_and_config_vlan, config_custom_vxlan_port, shutdown_interface, \
     remove_add_portchannel_member, get_hash_algorithm_from_option, check_global_hash_algorithm, get_diff_hash_algorithm
 from generic_hash_helper import restore_configuration, reload, global_hash_capabilities, restore_interfaces  # noqa:F401
 from generic_hash_helper import mg_facts, restore_init_hash_config, restore_vxlan_port, \
@@ -183,7 +183,7 @@ def test_ecmp_hash(rand_selected_dut, tbinfo, ptfhost, fine_params, mg_facts, gl
             params=ptf_params,
             log_file=PTF_LOG_PATH,
             qlen=PTF_QLEN,
-            socket_recv_size=16384,
+            socket_recv_size=SOCKET_RECV_SIZE,
             is_python3=True
         )
 
@@ -255,7 +255,7 @@ def test_lag_hash(rand_selected_dut, ptfhost, tbinfo, fine_params, mg_facts, res
             params=ptf_params,
             log_file=PTF_LOG_PATH,
             qlen=PTF_QLEN,
-            socket_recv_size=16384,
+            socket_recv_size=SOCKET_RECV_SIZE,
             is_python3=True
         )
 
@@ -320,7 +320,7 @@ def test_ecmp_and_lag_hash(rand_selected_dut, tbinfo, ptfhost, fine_params, mg_f
             params=ptf_params,
             log_file=PTF_LOG_PATH,
             qlen=PTF_QLEN,
-            socket_recv_size=16384,
+            socket_recv_size=SOCKET_RECV_SIZE,
             is_python3=True
         )
 
@@ -376,7 +376,7 @@ def test_nexthop_flap(rand_selected_dut, tbinfo, ptfhost, fine_params, mg_facts,
             params=ptf_params,
             log_file=PTF_LOG_PATH,
             qlen=PTF_QLEN,
-            socket_recv_size=16384,
+            socket_recv_size=SOCKET_RECV_SIZE,
             is_python3=True
         )
     with allure.step('Randomly shutdown 1 nexthop interface'):
@@ -396,7 +396,7 @@ def test_nexthop_flap(rand_selected_dut, tbinfo, ptfhost, fine_params, mg_facts,
             params=ptf_params,
             log_file=PTF_LOG_PATH,
             qlen=PTF_QLEN,
-            socket_recv_size=16384,
+            socket_recv_size=SOCKET_RECV_SIZE,
             is_python3=True
         )
     with allure.step('Startup the interface, and then flap it 3 more times'):
@@ -414,7 +414,7 @@ def test_nexthop_flap(rand_selected_dut, tbinfo, ptfhost, fine_params, mg_facts,
             params=ptf_params,
             log_file=PTF_LOG_PATH,
             qlen=PTF_QLEN,
-            socket_recv_size=16384,
+            socket_recv_size=SOCKET_RECV_SIZE,
             is_python3=True
         )
 
@@ -487,7 +487,7 @@ def test_lag_member_flap(rand_selected_dut, tbinfo, ptfhost, fine_params, mg_fac
             params=ptf_params,
             log_file=PTF_LOG_PATH,
             qlen=PTF_QLEN,
-            socket_recv_size=16384,
+            socket_recv_size=SOCKET_RECV_SIZE,
             is_python3=True
         )
 
@@ -513,7 +513,7 @@ def test_lag_member_flap(rand_selected_dut, tbinfo, ptfhost, fine_params, mg_fac
             params=ptf_params,
             log_file=PTF_LOG_PATH,
             qlen=PTF_QLEN,
-            socket_recv_size=16384,
+            socket_recv_size=SOCKET_RECV_SIZE,
             is_python3=True
         )
 
@@ -588,7 +588,7 @@ def test_lag_member_remove_add(rand_selected_dut, tbinfo, ptfhost, fine_params, 
             params=ptf_params,
             log_file=PTF_LOG_PATH,
             qlen=PTF_QLEN,
-            socket_recv_size=16384,
+            socket_recv_size=SOCKET_RECV_SIZE,
             is_python3=True
         )
 
@@ -612,7 +612,7 @@ def test_lag_member_remove_add(rand_selected_dut, tbinfo, ptfhost, fine_params, 
             params=ptf_params,
             log_file=PTF_LOG_PATH,
             qlen=PTF_QLEN,
-            socket_recv_size=16384,
+            socket_recv_size=SOCKET_RECV_SIZE,
             is_python3=True
         )
 
@@ -669,7 +669,7 @@ def test_reboot(rand_selected_dut, tbinfo, ptfhost, localhost, fine_params, mg_f
             params=ptf_params,
             log_file=PTF_LOG_PATH,
             qlen=PTF_QLEN,
-            socket_recv_size=16384,
+            socket_recv_size=SOCKET_RECV_SIZE,
             is_python3=True
         )
 
@@ -701,7 +701,7 @@ def test_reboot(rand_selected_dut, tbinfo, ptfhost, localhost, fine_params, mg_f
             params=ptf_params,
             log_file=PTF_LOG_PATH,
             qlen=PTF_QLEN,
-            socket_recv_size=16384,
+            socket_recv_size=SOCKET_RECV_SIZE,
             is_python3=True
         )
 
