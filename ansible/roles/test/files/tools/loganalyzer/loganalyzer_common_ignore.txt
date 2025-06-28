@@ -375,6 +375,8 @@ r, ".*ERR pmon#xcvrd\[\d+\]: .*VDM.*"
 
 # temporary workaround on internal-202412-dev branch
 r, ".*ERR swss#orchagent: :- update: Failed to get port by bridge port ID.*"
-
+r, ".*ERR syncd#syncd: :- process_on_fdb_event: invalid OIDs in fdb notifications, NOT translating and NOT storing in ASIC DB.*"
+r, ".*ERR syncd#syncd: :- process_on_fdb_event: FDB notification was not sent since it contain invalid OIDs, bug?.*
+"
 # Ignore PFC Watchdog start failures on Ethernet ports
 r, ".*ERR swss#orchagent: :- createEntry: Failed to start PFC Watchdog on port Ethernet\d+.*"
