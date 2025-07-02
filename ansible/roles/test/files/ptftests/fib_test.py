@@ -366,7 +366,7 @@ class FibTest(BaseTest):
             masked_exp_pkt.set_do_not_care_scapy(scapy.IP, "chksum")
             masked_exp_pkt.set_do_not_care_scapy(scapy.TCP, "chksum")
 
-        send_packet(self, src_port, pkt)
+        send_packet(self, src_port, pkt, count=10)
         logging.info('Sent Ether(src={}, dst={})/IP(src={}, dst={})/TCP(sport={}, dport={}) on port {}'
                      .format(pkt.src,
                              pkt.dst,
@@ -461,7 +461,7 @@ class FibTest(BaseTest):
             masked_exp_pkt.set_do_not_care_scapy(scapy.IPv6, "hlim")
             masked_exp_pkt.set_do_not_care_scapy(scapy.TCP, "chksum")
 
-        send_packet(self, src_port, pkt)
+        send_packet(self, src_port, pkt, count=10)
         logging.info('Sent Ether(src={}, dst={})/IPv6(src={}, dst={})/TCP(sport={}, dport={}) on port {}'
                      .format(pkt.src,
                              pkt.dst,

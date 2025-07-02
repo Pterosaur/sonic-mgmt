@@ -328,7 +328,7 @@ class HashTest(BaseTest):
         masked_exp_pkt.set_do_not_care_scapy(scapy.Ether, "src")
 
         try:
-            send_packet(self, src_port, pkt)
+            send_packet(self, src_port, pkt, count=10)
             logging.info('Sent Ether(src={}, dst={})/IP(src={}, dst={}, proto={})/TCP(sport={}, dport={} on port {})'
                          .format(pkt.src,
                                  pkt.dst,
@@ -354,7 +354,7 @@ class HashTest(BaseTest):
 
         except AssertionError:
             logging.error("Traffic wasn't sent successfully, trying again")
-            send_packet(self, src_port, pkt, count=5)
+            send_packet(self, src_port, pkt, count=10)
             logging.info('Sent Ether(src={}, dst={})/IP(src={}, dst={}, proto={})/TCP(sport={}, dport={} on port {})'
                          .format(pkt.src,
                                  pkt.dst,
@@ -442,7 +442,7 @@ class HashTest(BaseTest):
         masked_exp_pkt.set_do_not_care_scapy(scapy.Ether, "src")
 
         try:
-            send_packet(self, src_port, pkt)
+            send_packet(self, src_port, pkt, count=10)
             logging.info('Sent Ether(src={}, dst={})/IPv6(src={}, dst={}, proto={})/TCP(sport={}, dport={} on port {})'
                          .format(pkt.src,
                                  pkt.dst,
@@ -468,7 +468,7 @@ class HashTest(BaseTest):
 
         except AssertionError:
             logging.error("Traffic wasn't sent successfully, trying again")
-            send_packet(self, src_port, pkt, count=5)
+            send_packet(self, src_port, pkt, count=10)
             logging.info('Sent Ether(src={}, dst={})/IPv6(src={}, dst={}, proto={})/TCP(sport={}, dport={} on port {})'
                          .format(pkt.src,
                                  pkt.dst,
@@ -695,7 +695,7 @@ class IPinIPHashTest(HashTest):
             masked_exp_pkt.set_do_not_care_scapy(scapy.IP, "chksum")
             masked_exp_pkt.set_do_not_care_scapy(scapy.TCP, "chksum")
 
-        send_packet(self, src_port, ipinip_pkt)
+        send_packet(self, src_port, ipinip_pkt, count=10)
         logging.info('Sent Ether(src={}, dst={})/IP(src={}, dst={}, proto={})/IP(src={}, '
                      'dst={}, proto={})/TCP(sport={}, dport={} on port {})'
                      .format(ipinip_pkt.src,
@@ -794,7 +794,7 @@ class IPinIPHashTest(HashTest):
             masked_exp_pkt.set_do_not_care_scapy(scapy.IP, "chksum")
             masked_exp_pkt.set_do_not_care_scapy(scapy.TCP, "chksum")
 
-        send_packet(self, src_port, ipinip_pkt)
+        send_packet(self, src_port, ipinip_pkt, count=10)
         logging.info('Sent Ether(src={}, dst={})/IP(src={}, dst={}, proto={})/IPv6(src={}, '
                      'dst={}, proto={})/TCP(sport={}, dport={} on port {})'
                      .format(ipinip_pkt.src,
@@ -995,7 +995,7 @@ class VxlanHashTest(HashTest):
             masked_exp_pkt.set_do_not_care_scapy(scapy.IP, "chksum")
             masked_exp_pkt.set_do_not_care_scapy(scapy.TCP, "chksum")
 
-        send_packet(self, src_port, vxlan_pkt)
+        send_packet(self, src_port, vxlan_pkt, count=10)
         logging.info('Sent Outer Ether(src={}, dst={})/IP(src={}, dst={})VxLAN(sport={}, '
                      'dport={})/Inner Ether(src={}, dst={}), IP(src={}, '
                      'dst={} )/TCP(sport={}, dport={} on port {})'
@@ -1101,7 +1101,7 @@ class VxlanHashTest(HashTest):
         masked_exp_pkt.set_do_not_care_scapy(scapy.Ether, "src")
         masked_exp_pkt.set_do_not_care_scapy(scapy.Ether, "dst")
 
-        send_packet(self, src_port, vxlan_pkt)
+        send_packet(self, src_port, vxlan_pkt, count=10)
         logging.info('Sent Ether(src={}, dst={})/IP(src={}, dst={})VxLAN(sport={}, dport={})'
                      '/Inner Ether(src={}, dst={}), Inner IPv6(src={}, '
                      'dst={})/TCP(sport={}, dport={} on port {})'
@@ -1322,7 +1322,7 @@ class NvgreHashTest(HashTest):
         masked_exp_pkt.set_do_not_care_scapy(scapy.Ether, "src")
         masked_exp_pkt.set_do_not_care_scapy(scapy.Ether, "dst")
 
-        send_packet(self, src_port, nvgre_pkt)
+        send_packet(self, src_port, nvgre_pkt, count=10)
         logging.info('Sent Outer Ether(src={}, dst={})/IP(src={}, dst={}, nvgre_tni={})'
                      '/Inner Ether(src={}, dst={}), IP(src={}, '
                      'dst={} )/TCP(sport={}, dport={} on port {})'
@@ -1422,7 +1422,7 @@ class NvgreHashTest(HashTest):
         masked_exp_pkt.set_do_not_care_scapy(scapy.Ether, "dst")
         masked_exp_pkt.set_do_not_care_scapy(scapy.IPv6, "hlim")
 
-        send_packet(self, src_port, nvgre_pkt)
+        send_packet(self, src_port, nvgre_pkt, count=10)
         logging.info('Sent Ether(src={}, dst={})/IP(src={}, dst={}, proto={})/IPv6(src={}, '
                      'dst={})/TCP(sport={}, dport={} on port {})'
                      .format(nvgre_pkt.src,
