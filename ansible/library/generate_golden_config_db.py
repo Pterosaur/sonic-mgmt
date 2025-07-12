@@ -158,10 +158,9 @@ class GenerateGoldenConfigDBModule(object):
 
         return out
 
-    def overwrite_feature_golden_config_db_multiasic(self, config, feature_key,
-                                                     auto_restart="enabled", state="enabled"):
+    def overwrite_feature_golden_config_db_multiasic(self, config, feature_key):
         full_config = json.loads(config)
-        if full_config == {} or "FEATURE" not in full_config.get("localhost", {}):
+        if config == "{}" or "FEATURE" not in config["localhost"]:
             # need dump running config FEATURE + selected feature
             gold_config_db = json.loads(self.get_multiasic_feature_config())
         else:
@@ -170,14 +169,14 @@ class GenerateGoldenConfigDBModule(object):
 
         feature_data = {
             feature_key: {
-                "auto_restart": auto_restart,
+                "auto_restart": "enabled",
                 "check_up_status": "false",
                 "delayed": "False",
                 "has_global_scope": "False",
                 "has_per_asic_scope": "True",
                 "high_mem_alert": "disabled",
                 "set_owner": "local",
-                "state": state,
+                "state": "enabled",
                 "support_syslog_rate_limit": "false"
             }
         }
@@ -189,8 +188,7 @@ class GenerateGoldenConfigDBModule(object):
 
         return json.dumps(gold_config_db, indent=4)
 
-    def overwrite_feature_golden_config_db_singleasic(self, config, feature_key,
-                                                      auto_restart="enabled", state="enabled"):
+    def overwrite_feature_golden_config_db_singleasic(self, config, feature_key):
         full_config = config
         onlyFeature = config == "{}"  # FEATURE needs special handling since it does not support incremental update.
         if config == "{}":
@@ -203,14 +201,14 @@ class GenerateGoldenConfigDBModule(object):
 
         # Append the specified feature section to the original "FEATURE" section
         ori_config_db.setdefault("FEATURE", {}).setdefault(feature_key, {}).update({
-            "auto_restart": auto_restart,
+            "auto_restart": "enabled",
             "check_up_status": "false",
             "delayed": "False",
             "has_global_scope": "True",
             "has_per_asic_scope": "False",
             "high_mem_alert": "disabled",
             "set_owner": "local",
-            "state": state,
+            "state": "enabled",
             "support_syslog_rate_limit": "false"
         })
 
@@ -265,10 +263,8 @@ class GenerateGoldenConfigDBModule(object):
         # To enable bmp feature
         if self.check_version_for_bmp() is True:
             if multi_asic.is_multi_asic():
-                config = self.overwrite_feature_golden_config_db_multiasic(config, "frr_bmp", "disabled", "enabled")
                 config = self.overwrite_feature_golden_config_db_multiasic(config, "bmp")
             else:
-                config = self.overwrite_feature_golden_config_db_singleasic(config, "frr_bmp", "disabled", "enabled")
                 config = self.overwrite_feature_golden_config_db_singleasic(config, "bmp")
 
         with open(GOLDEN_CONFIG_DB_PATH, "w") as temp_file:
