@@ -1050,7 +1050,6 @@ generic_config_updater/test_eth_interface.py::test_replace_fec:
     conditions_logical_operator: "OR"
     conditions:
       - "hwsku in ['Arista-7260CX3-D108C8', 'Arista-7260CX3-D108C10', 'Arista-7260CX3-Q64', 'Mellanox-SN3800-D112C8'] and https://github.com/sonic-net/sonic-mgmt/issues/11237"
-      - "'t2' in topo_name"
 
 generic_config_updater/test_eth_interface.py::test_toggle_pfc_asym:
   skip:
@@ -1747,6 +1746,12 @@ pc/test_po_voq.py:
     reason: "Skip for non t2 or Skip since there is no portchannel configured or no portchannel member exists in current topology."
     conditions:
       - "'t2' not in topo_name or num_asic == 0 or len(minigraph_portchannels[list(minigraph_portchannels.keys())[0]]['members']) == 0 or asic_type in ['cisco-8000']"
+
+pc/test_retry_count.py::test_retry_count:
+  xfail:
+    reason: "Test set up is failing. Need owner to fix it."
+    conditions:
+        - "https://github.com/sonic-net/sonic-mgmt/issues/19400"
 
 #######################################
 #####           pfc               #####
@@ -2835,6 +2840,10 @@ vxlan/test_vxlan_decap.py:
     reason: "vxlan support not available for cisco-8122 platforms"
     conditions:
       - "platform in ['x86_64-8122_64eh_o-r0', 'x86_64-8122_64ehf_o-r0']"
+  xfail:
+    reason: "Skipped due to bug https://github.com/sonic-net/sonic-buildimage/issues/22056"
+    conditions:
+      - "topo_name in ['t0-isolated-d16u16s1','t0-isolated-d32u32s2'] and https://github.com/sonic-net/sonic-buildimage/issues/22056"
 
 vxlan/test_vxlan_ecmp.py:
   skip:
