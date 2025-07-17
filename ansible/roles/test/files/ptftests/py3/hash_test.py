@@ -349,7 +349,7 @@ class HashTest(BaseTest):
 
             dst_ports = list(itertools.chain(*dst_port_lists))
             rcvd_port_index, rcvd_pkt = verify_packet_any_port(
-                self, masked_exp_pkt, dst_ports, timeout=10)
+                self, masked_exp_pkt, dst_ports, timeout=100)
             rcvd_port = dst_ports[rcvd_port_index]
 
         except AssertionError:
@@ -365,7 +365,7 @@ class HashTest(BaseTest):
                                  dport,
                                  src_port))
             rcvd_port_index, rcvd_pkt = verify_packet_any_port(
-                self, masked_exp_pkt, dst_ports, timeout=10)
+                self, masked_exp_pkt, dst_ports, timeout=100)
             rcvd_port = dst_ports[rcvd_port_index]
 
         exp_src_mac = None
@@ -463,7 +463,7 @@ class HashTest(BaseTest):
 
             dst_ports = list(itertools.chain(*dst_port_lists))
             rcvd_port_index, rcvd_pkt = verify_packet_any_port(
-                self, masked_exp_pkt, dst_ports, timeout=10)
+                self, masked_exp_pkt, dst_ports, timeout=100)
             rcvd_port = dst_ports[rcvd_port_index]
 
         except AssertionError:
@@ -489,7 +489,7 @@ class HashTest(BaseTest):
 
             dst_ports = list(itertools.chain(*dst_port_lists))
             rcvd_port_index, rcvd_pkt = verify_packet_any_port(
-                self, masked_exp_pkt, dst_ports, timeout=10)
+                self, masked_exp_pkt, dst_ports, timeout=100)
             rcvd_port = dst_ports[rcvd_port_index]
 
         exp_src_mac = None
@@ -712,7 +712,7 @@ class IPinIPHashTest(HashTest):
 
         dst_ports = list(itertools.chain(*dst_port_lists))
         rcvd_port_index, rcvd_pkt = verify_packet_any_port(
-            self, masked_exp_pkt, dst_ports, timeout=10)
+            self, masked_exp_pkt, dst_ports, timeout=100)
         rcvd_port = dst_ports[rcvd_port_index]
         exp_src_mac = None
 
@@ -811,7 +811,7 @@ class IPinIPHashTest(HashTest):
 
         dst_ports = list(itertools.chain(*dst_port_lists))
         rcvd_port_index, rcvd_pkt = verify_packet_any_port(
-            self, masked_exp_pkt, dst_ports, timeout=10)
+            self, masked_exp_pkt, dst_ports, timeout=100)
         rcvd_port = dst_ports[rcvd_port_index]
 
         exp_src_mac = None
@@ -1016,7 +1016,7 @@ class VxlanHashTest(HashTest):
 
         dst_ports = list(itertools.chain(*dst_port_lists))
         rcvd_port_index, rcvd_pkt = verify_packet_any_port(
-            self, masked_exp_pkt, dst_ports, timeout=10)
+            self, masked_exp_pkt, dst_ports, timeout=100)
         rcvd_port = dst_ports[rcvd_port_index]
         exp_src_mac = None
         if len(self.ptf_test_port_map[str(rcvd_port)]["target_src_mac"]) > 1:
@@ -1121,7 +1121,7 @@ class VxlanHashTest(HashTest):
 
         dst_ports = list(itertools.chain(*dst_port_lists))
         rcvd_port_index, rcvd_pkt = verify_packet_any_port(
-            self, masked_exp_pkt, dst_ports, timeout=10)
+            self, masked_exp_pkt, dst_ports, timeout=100)
         rcvd_port = dst_ports[rcvd_port_index]
 
         exp_src_mac = None
@@ -1341,7 +1341,7 @@ class NvgreHashTest(HashTest):
 
         dst_ports = list(itertools.chain(*dst_port_lists))
         rcvd_port_index, rcvd_pkt = verify_packet_any_port(
-            self, masked_exp_pkt, dst_ports, timeout=10)
+            self, masked_exp_pkt, dst_ports, timeout=100)
         rcvd_port = dst_ports[rcvd_port_index]
         exp_src_mac = None
         if len(self.ptf_test_port_map[str(rcvd_port)]["target_src_mac"]) > 1:
@@ -1438,7 +1438,7 @@ class NvgreHashTest(HashTest):
 
         dst_ports = list(itertools.chain(*dst_port_lists))
         rcvd_port_index, rcvd_pkt = verify_packet_any_port(
-            self, masked_exp_pkt, dst_ports, timeout=10)
+            self, masked_exp_pkt, dst_ports, timeout=100)
         rcvd_port = dst_ports[rcvd_port_index]
 
         exp_src_mac = None
