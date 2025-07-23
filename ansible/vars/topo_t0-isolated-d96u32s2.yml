@@ -217,22 +217,6 @@ topology:
       vlans:
         - 29
       vm_offset: 29
-    ARISTA31T1:
-      vlans:
-        - 30
-      vm_offset: 30
-    ARISTA32T1:
-      vlans:
-        - 31
-      vm_offset: 31
-    ARISTA01PT0:
-      vlans:
-        - 128
-      vm_offset: 32
-    ARISTA02PT0:
-      vlans:
-        - 129
-      vm_offset: 33
   DUT:
     vlan_configs:
       default_vlan_config: one_vlan_a
