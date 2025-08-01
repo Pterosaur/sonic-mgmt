@@ -402,4 +402,6 @@ r, ".* ERR pmon#chassis_db_init: Failed to load chassis due to ModuleNotFoundErr
 r, ".* ERR ntpd.*: CLOCK: leapsecond file ('/usr/share/zoneinfo/leap-seconds.list'): .*"
 
 # Ignore Cisco VDM error
-r, ".* ERR.*Failed to confirm VDM freeze status.*"
+r, ".* ERR pmon.*Failed to freeze VDM.*"
+r, ".* ERR pmon.*Failed to confirm VDM.*"
+r, ".* ERR pmon.*Failed to unfreeze VDM.*"
