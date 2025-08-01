@@ -2649,8 +2649,8 @@ str5-7060x6-moby-512-1,Ethernet104,str5-7060x6-moby-512-fan-1,Ethernet104,400000
 str5-7060x6-moby-512-1,Ethernet108,str5-7060x6-moby-512-fan-1,Ethernet108,400000,2339,Access,on
 str5-7060x6-moby-512-1,Ethernet112,str5-7060x6-moby-512-fan-1,Ethernet112,400000,2340,Access,on
 str5-7060x6-moby-512-1,Ethernet116,str5-7060x6-moby-512-fan-1,Ethernet116,400000,2341,Access,on
-str5-7060x6-moby-512-1,Ethernet120,str5-7060x6-64pe-shared-fan-1,Ethernet160,400000,2342,Access,off
-str5-7060x6-moby-512-1,Ethernet124,str5-7060x6-64pe-shared-fan-1,Ethernet164,400000,2343,Access,off
+str5-7060x6-moby-512-1,Ethernet120,str5-7060x6-moby-512-fan-1,Ethernet160,400000,2342,Access,off
+str5-7060x6-moby-512-1,Ethernet124,str5-7060x6-moby-512-fan-1,Ethernet164,400000,2343,Access,off
 str5-7060x6-moby-512-1,Ethernet128,str5-7060x6-moby-512-fan-1,Ethernet128,400000,2344,Access,on
 str5-7060x6-moby-512-1,Ethernet132,str5-7060x6-moby-512-fan-1,Ethernet132,400000,2345,Access,on
 str5-7060x6-moby-512-1,Ethernet136,str5-7060x6-moby-512-fan-1,Ethernet136,400000,2346,Access,on
