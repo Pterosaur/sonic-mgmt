@@ -533,8 +533,8 @@ str5-7060x6-512-3,Ethernet508,str5-7060x6-512-fan-3,Ethernet508,100000,608,Acces
 str5-7060x6-512-3,Ethernet509,str5-7060x6-512-fan-3,Ethernet509,100000,609,Access,on
 str5-7060x6-512-3,Ethernet510,str5-7060x6-512-fan-3,Ethernet510,100000,610,Access,on
 str5-7060x6-512-3,Ethernet511,str5-7060x6-512-fan-3,Ethernet511,100000,611,Access,on
-str5-7060x6-512-3,Ethernet512,str5-7060x6-512-fan-3,Ethernet512,10000,612,Access,off
-str5-7060x6-512-3,Ethernet513,str5-7060x6-512-fan-3,Ethernet513,10000,613,Access,off
+str5-7060x6-512-3,Ethernet512,str5-7060x6-512-fan-3,Ethernet512,10000,612,Access,
+str5-7060x6-512-3,Ethernet513,str5-7060x6-512-fan-3,Ethernet513,10000,613,Access,
 str5-7060x6-512-4,Ethernet0,str5-7060x6-512-fan-4,Ethernet0,100000,614,Access,on
 str5-7060x6-512-4,Ethernet1,str5-7060x6-512-fan-4,Ethernet1,100000,615,Access,on
 str5-7060x6-512-4,Ethernet2,str5-7060x6-512-fan-4,Ethernet2,100000,616,Access,on
@@ -3007,8 +3007,8 @@ str5-7060x6-moby-512-3,Ethernet496,str5-7060x6-moby-512-fan-3,Ethernet496,400000
 str5-7060x6-moby-512-3,Ethernet500,str5-7060x6-moby-512-fan-3,Ethernet500,400000,2771,Access,on
 str5-7060x6-moby-512-3,Ethernet504,str5-7060x6-moby-512-fan-3,Ethernet504,400000,2772,Access,on
 str5-7060x6-moby-512-3,Ethernet508,str5-7060x6-moby-512-fan-3,Ethernet508,400000,2773,Access,on
-str5-7060x6-moby-512-3,Ethernet512,str5-7060x6-moby-512-fan-3,Ethernet512,400000,2774,Access,off
-str5-7060x6-moby-512-3,Ethernet513,str5-7060x6-moby-512-fan-3,Ethernet513,400000,2775,Access,off
+str5-7060x6-moby-512-3,Ethernet512,str5-7060x6-moby-512-fan-3,Ethernet512,400000,2774,Access,
+str5-7060x6-moby-512-3,Ethernet513,str5-7060x6-moby-512-fan-3,Ethernet513,400000,2775,Access,
 str5-sn5640-6,Ethernet0,str5-sn5640-fan-6,Ethernet0,100000,2450,Access,on
 str5-sn5640-6,Ethernet1,str5-sn5640-fan-6,Ethernet1,100000,,Access,on
 str5-sn5640-6,Ethernet2,str5-sn5640-fan-6,Ethernet2,100000,,Access,on
