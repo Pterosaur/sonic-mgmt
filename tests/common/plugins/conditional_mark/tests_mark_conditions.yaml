@@ -1140,17 +1140,13 @@ generic_config_updater/test_pg_headroom_update.py:
 #######################################
 #####           gnmi              #####
 #######################################
-gnmi/test_gnmi_configdb.py:
+
+gnmi:
   skip:
-    reason: "This feature is not supported for multi asic. Skipping these test for T2 and multi asic."
+    reason: "GNMI service is not healthy on the 202412"
     conditions_logical_operator: or
     conditions:
-      - "'t2' in topo_name"
-      - "is_multi_asic==True"
-
-gnmi/test_gnoi_killprocess.py::test_gnoi_killprocess_then_restart:
-  skip:
-    reason: "Test noisy due to restart issue not relevant to GNOI. Disabling them to rewrite."
+      - "release in ['202412']"
 
 #######################################
 #####           hash              #####
