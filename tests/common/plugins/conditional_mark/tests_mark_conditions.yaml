@@ -1142,7 +1142,7 @@ generic_config_updater/test_pg_headroom_update.py:
 #######################################
 
 gnmi:
-  xfail:
+  skip:
     reason: "GNMI service is not healthy on the 202412"
     conditions_logical_operator: or
     conditions:
