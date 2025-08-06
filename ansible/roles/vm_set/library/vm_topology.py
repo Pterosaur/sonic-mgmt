@@ -639,7 +639,7 @@ class VMTopology(object):
             if mgmt_ipv6_addr and mgmt_gw_v6:
                 if not VMTopology.route_exists(mgmt_gw_v6, pid=self.pid, ipv6=True):
                     VMTopology.cmd(
-                        "nsenter -t %s -n ip -6 route add default via %s dev %s" % (self.pid, mgmt_gw_v6, int_if))
+                        "nsenter -t %s -n ip -6 route add default via %s dev %s || true" % (self.pid, mgmt_gw_v6, int_if), shell=True, split_cmd=False)
 
     def add_ip_to_netns_if(self, int_if, ip_addr, ipv6_addr=None, default_gw=None, default_gw_v6=None):
         """Add ip address to netns interface."""
