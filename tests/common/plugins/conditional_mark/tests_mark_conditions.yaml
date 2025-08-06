@@ -1153,9 +1153,13 @@ gnmi:
     reason: "GNMI service is not healthy on the 202412"
     conditions_logical_operator: or
     conditions:
-      - "release in ['202412']"
       - "'t2' in topo_name"
       - "is_multi_asic==True"
+  xfail:
+    reason: "GNMI service is not healthy on `isolated` topo"
+    conditions_logical_operator: or
+    conditions:
+      - "'isolated' in topo_name"
 
 gnmi/test_gnmi_configdb.py::test_gnmi_configdb_full_01:
   skip:
