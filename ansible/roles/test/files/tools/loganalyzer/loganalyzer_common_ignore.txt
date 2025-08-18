@@ -315,6 +315,8 @@ r, ".* ERR kernel:.*cisco-fpga-p2pm-m-slot p2pm-m-slot\.\d+: cisco_fpga_select_n
 r, ".* ERR kernel:.*cisco-fpga-pci \d+:\d+:\d+\.\d+: cisco_fpga_select_new_acpi_companion: searching for child status\d+ 0x[0-9a-f]+; fpga_id 0x[0-9a-f]+.*"
 r, ".* WARNING kernel:.*pcieport.*device.*error.*status/mask=.*"
 r, ".* ERR syncd\d*#syncd:.* -E-HLD-0- Trap.* is not supported.*"
+r, ".* ERR pmon#xcvrd:.*CMIS:.*no suitable app for the port appl.*"
+r, ".* ERR kernel:.*ltc2497.*i2c transfer failed: -EFAULT"
 
 
 # Ignore rsyslog librelp error if rsyslogd on host or container is down or going down
@@ -388,6 +390,8 @@ r, ".*ERR syncd#syncd:.*SAI_API_SWITCH:sai_query_stats_capability:\d+ stats capa
 
 # Ignore PFC Watchdog start failures on Ethernet ports
 r, ".*ERR swss#orchagent: :- createEntry: Failed to start PFC Watchdog on port Ethernet\d+.*"
+# Ignore unsupported enumerated attribute
+r, ".*ERR swss#orchagent: :- queryAttributeEnumValuesCapability: returned value \d+ is not allowed on SAI_SWITCH_ATTR_.*_DEFAULT_HASH_ALGORITHM.*"
 
 # https://msazure.visualstudio.com/One/_workitems/edit/33479668
 r, ".* ERR syncd#syncd: :- process_on_fdb_event: invalid OIDs in fdb notifications, NOT translating and NOT storing in ASIC DB.*"
@@ -412,3 +416,5 @@ r, ".* ERR ntpd.*: CLOCK: leapsecond file ('/usr/share/zoneinfo/leap-seconds.lis
 r, ".* ERR pmon.*Failed to freeze VDM.*"
 r, ".* ERR pmon.*Failed to confirm VDM.*"
 r, ".* ERR pmon.*Failed to unfreeze VDM.*"
+# Ignore lldp error log, don't have real impact
+r, ".* ERR container: docker cmd: stop for lldp failed with 500 Server Error.*"
