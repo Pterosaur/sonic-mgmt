@@ -418,3 +418,7 @@ r, ".* ERR pmon.*Failed to confirm VDM.*"
 r, ".* ERR pmon.*Failed to unfreeze VDM.*"
 # Ignore lldp error log, don't have real impact
 r, ".* ERR container: docker cmd: stop for lldp failed with 500 Server Error.*"
+
+# Ignore generic_config_updater/test_monitor_config.py, the order issue of config entries.
+r, ".*Mirror rule references mirror session .mirror_session_dscp. that does not exist yet.*"
+r, ".*Failed to create ACL rule RULE_1 in table EVERFLOW_DSCP.*"
