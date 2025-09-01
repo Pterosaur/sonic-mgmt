@@ -351,6 +351,8 @@ r, ".* ERR sshd\[\d*\]: auth fail.*"
 r, ".* ERR auditd\[\d*\]: Error receiving audit netlink packet \(No buffer space available\)"
 r, ".* ERR audisp-tacplus: tac_connect_single: connection failed with.*Interrupted system call"
 r, ".* ERR audisp-tacplus: tac_connect_single: connection failed with.*Transport endpoint is not connected"
+r, ".* ERR dockerd: tac_connect_single: connection failed with .* Transport endpoint is not connected"
+r, ".* ERR dockerd: nss_tacplus: failed to connect TACACS+ server .* Transport endpoint is not connected"
 
 # Errors for syncd shutdown on mellanox platform
 r, ".* ERR kernel:.*sxd_kernel: \[error\] SDK main monitor thread does not respond"
