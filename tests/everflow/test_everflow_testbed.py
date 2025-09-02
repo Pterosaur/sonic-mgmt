@@ -633,6 +633,7 @@ class EverflowIPv4Tests(BaseEverflowTest):
                                        policer_mirror_session["session_name"],
                                        config_method,
                                        rules=EVERFLOW_DSCP_RULES)
+            time.sleep(15)
 
             # Run test with expected CIR/CBS in packets/sec and tolerance %
             partial_ptf_runner(setup_info,
