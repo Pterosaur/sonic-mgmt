@@ -1601,7 +1601,8 @@ def get_test_ports(upstream_links, downstream_links, peer_links, mg_facts):
                             'dut_members': ['Ethernet96', 'Ethernet100']}}
 
         downlink_port:
-        {'Ethernet192': {'name': 'ARISTA81T0', 'ptf_port_id': 84, 'downstream_port': 'Ethernet1', 'dut_members': ['Ethernet192']}}
+        {'Ethernet192': {'name': 'ARISTA81T0', 'ptf_port_id': 84, 'downstream_port': 'Ethernet1',
+        'dut_members': ['Ethernet192']}}
     """
     logger.info("Selecting test ports")
     logger.info(f"upstream_links: {upstream_links}")
