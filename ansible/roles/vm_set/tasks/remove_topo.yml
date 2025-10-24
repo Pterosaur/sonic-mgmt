@@ -55,7 +55,6 @@
       duts_name: "{{ duts_name.split(',') }}"
       max_fp_num: "{{ max_fp_num }}"
       dut_interfaces: "{{ dut_interfaces | default('') }}"
-      is_vs_chassis: "{{ is_vs_chassis | default(false) }}"
       batch_mode: "{{ batch_mode if batch_mode is defined else omit }}"
     become: yes
     when: not enable_async
@@ -77,7 +76,6 @@
       duts_name: "{{ duts_name.split(',') }}"
       max_fp_num: "{{ max_fp_num }}"
       dut_interfaces: "{{ dut_interfaces | default('') }}"
-      is_vs_chassis: "{{ is_vs_chassis | default(false) }}"
     become: yes
     async: 3600
     poll: 0
