@@ -1,5 +1,6 @@
 {% set host = configuration[hostname] %}
 {% set mgmt_ip = ansible_host %}
+{% set tornum = host['tornum'] %}
 {% if vm_type is defined and vm_type == "ceos" %}
 {% set mgmt_if_index = 0 %}
 {% else %}
@@ -50,11 +51,11 @@ ip route vrf MGMT 0.0.0.0/0 {{ mgmt_gw }}
 !
 interface Management {{ mgmt_if_index }}
  description TO LAB MGMT SWITCH
-{% if vm_type is defined and vm_type == "ceos" %}
+ {% if vm_type is defined and vm_type == "ceos" %}
  vrf MGMT
 {% else %}
  vrf forwarding MGMT
-{% endif %}
+ {% endif %}
  ip address {{ mgmt_ip }}/{{ mgmt_prefixlen }}
  no shutdown
 !
@@ -70,10 +71,6 @@ interface {{ name }}
 {% if name.startswith('Port-Channel') %}
  port-channel min-links 1
 {% endif %}
-{% if iface['lacp'] is defined %}
- channel-group {{ iface['lacp'] }} mode active
- lacp rate normal
-{% endif %}
 {% if iface['ipv4'] is defined %}
  ip address {{ iface['ipv4'] }}
 {% endif %}
@@ -81,6 +78,10 @@ interface {{ name }}
  ipv6 enable
  ipv6 address {{ iface['ipv6'] }}
  ipv6 nd ra suppress
+{% endif %}
+{% if iface['lacp'] is defined %}
+ channel-group {{ iface['lacp'] }} mode active
+ lacp rate normal
 {% endif %}
  no shutdown
 !
@@ -110,7 +111,6 @@ router bgp {{ host['bgp']['asn'] }}
 {% for remote_ip in remote_ips %}
  neighbor {{ remote_ip }} remote-as {{ asn }}
  neighbor {{ remote_ip }} description {{ asn }}
- neighbor {{ remote_ip }} next-hop-self
 {% if remote_ip | ansible.utils.ipv6 %}
  address-family ipv6
   neighbor {{ remote_ip }} activate

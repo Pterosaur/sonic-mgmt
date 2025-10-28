@@ -51,10 +51,13 @@
       vm_base: "{{ VM_base }}"
       vm_type: "{{ vm_type }}"
       duts_fp_ports: "{{ duts_fp_ports }}"
+      duts_midplane_ports: "{{ duts_midplane_ports }}"
+      duts_inband_ports: "{{ duts_inband_ports }}"
       duts_mgmt_port: "{{ duts_mgmt_port }}"
       duts_name: "{{ duts_name.split(',') }}"
       max_fp_num: "{{ max_fp_num }}"
       dut_interfaces: "{{ dut_interfaces | default('') }}"
+      is_vs_chassis: "{{ is_vs_chassis | default(false) }}"
       batch_mode: "{{ batch_mode if batch_mode is defined else omit }}"
     become: yes
     when: not enable_async
@@ -72,10 +75,13 @@
       vm_base: "{{ VM_base }}"
       vm_type: "{{ vm_type }}"
       duts_fp_ports: "{{ duts_fp_ports }}"
+      duts_midplane_ports: "{{ duts_midplane_ports }}"
+      duts_inband_ports: "{{ duts_inband_ports }}"
       duts_mgmt_port: "{{ duts_mgmt_port }}"
       duts_name: "{{ duts_name.split(',') }}"
       max_fp_num: "{{ max_fp_num }}"
       dut_interfaces: "{{ dut_interfaces | default('') }}"
+      is_vs_chassis: "{{ is_vs_chassis | default(false) }}"
     become: yes
     async: 3600
     poll: 0
@@ -95,7 +101,6 @@
     retries: 30
     delay: 60
     when: enable_async
-
 
   - name: Unbind topology {{ topo }} to DPU VMs. base vm = {{ VM_base }}
     vm_topology:

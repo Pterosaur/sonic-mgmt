@@ -68,7 +68,7 @@ interface {{ name }}
  no shutdown
 {% endif %}
 {% if name.startswith('Port-Channel') %}
- port-channel min-links 1
+ port-channel min-links 2
 {% endif %}
 {% if iface['lacp'] is defined %}
  channel-group {{ iface['lacp'] }} mode active
@@ -103,14 +103,10 @@ interface {{ bp_ifname }}
 router bgp {{ host['bgp']['asn'] }}
  router-id {{ host['interfaces']['Loopback0']['ipv4'] | ansible.utils.ipaddr('address') }}
  !
- graceful-restart restart-time {{ bgp_gr_timer }}
- graceful-restart
- !
 {% for asn, remote_ips in host['bgp']['peers'].items() %}
 {% for remote_ip in remote_ips %}
  neighbor {{ remote_ip }} remote-as {{ asn }}
  neighbor {{ remote_ip }} description {{ asn }}
- neighbor {{ remote_ip }} next-hop-self
 {% if remote_ip | ansible.utils.ipv6 %}
  address-family ipv6
   neighbor {{ remote_ip }} activate
