@@ -2087,15 +2087,15 @@
   auto_recover: 'True'
   comment: janetcui
 
-- conf-name: vms97-t1-sn5640-1
-  group-name: vms97-1
-  topo: t1-isolated-d448u15-lag
+- conf-name: vms91-t1-sn5640-4
+  group-name: vms91-2
+  topo: t1-isolated-d56u1-lag
   ptf_image_name: docker-ptf
-  ptf: vms97-1
+  ptf: vms91-2
   ptf_ip: 10.64.247.150/23
   ptf_ipv6: 2a01:111:e210:b000::a40:f796/64
-  server: server_97
-  vm_base: VM97000
+  server: server_91
+  vm_base: VM91034
   dut:
   - str5-sn5640-4
   inv_name: str5
@@ -4921,3 +4921,37 @@
   comment: Beijing Lab
   ptf_extra_mgmt_ip:
     - 172.16.188.153/17
+
+- conf-name: testbed-bjw2-can-e1031-1
+  group-name: bjw2-4-3
+  topo: m0
+  ptf_image_name: docker-ptf
+  ptf: bjw2-4-3
+  ptf_ip: 10.150.23.140/23
+  ptf_ipv6: 2404:f801:10:2200::a96:178c/52
+  server: server_bjw2_4
+  vm_base: VM84000
+  dut:
+    - bjw2-can-e1031-1
+  inv_name: bjw2
+  auto_recover: 'True'
+  comment: Beijing Lab
+  ptf_extra_mgmt_ip:
+    - 172.16.188.154/17
+
+- conf-name: testbed-bjw2-can-e1031-2
+  group-name: bjw2-9-5
+  topo: m0
+  ptf_image_name: docker-ptf
+  ptf: bjw2-9-5
+  ptf_ip: 10.150.23.141/23
+  ptf_ipv6: 2404:f801:10:2200::a96:178d/52
+  server: server_bjw2_9
+  vm_base: VM89004
+  dut:
+    - bjw2-can-e1031-2
+  inv_name: bjw2
+  auto_recover: 'True'
+  comment: Beijing Lab
+  ptf_extra_mgmt_ip:
+    - 172.16.188.155/17
