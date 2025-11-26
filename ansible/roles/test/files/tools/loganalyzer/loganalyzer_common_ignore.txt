@@ -427,3 +427,6 @@ r, ".* ERR container: docker cmd: stop for lldp failed with 500 Server Error.*"
 # Ignore generic_config_updater/test_monitor_config.py, the order issue of config entries.
 r, ".*Mirror rule references mirror session .mirror_session_dscp. that does not exist yet.*"
 r, ".*Failed to create ACL rule RULE_1 in table EVERFLOW_DSCP.*"
+
+# Ignore syncd error when switching global packet trimming mode
+r, ".*ERR .* SAI_API_SWITCH:brcm_sai_switch_pkt_trim_qos_tc_egr_entries_create:.* Egress qos map with idx .* entries are already present.*"
