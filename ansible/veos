@@ -529,7 +529,7 @@ vm_host_98:
       ansible_host: 10.64.247.198
 vm_host_99:
   hosts:
-    STR5-ACS-SERV-97:
+    STR4-ACS-SERV-97:
       ansible_host: 10.64.247.199
 vm_host_18:
   hosts:
