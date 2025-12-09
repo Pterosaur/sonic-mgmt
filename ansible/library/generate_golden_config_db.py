@@ -338,10 +338,6 @@ class GenerateGoldenConfigDBModule(object):
         else:
             config = "{}"
 
-        # Generate dummy table for HFT
-        if not multi_asic.is_multi_asic():
-            config = self.generate_dummy_hft_config_db(config)
-
         with open(GOLDEN_CONFIG_DB_PATH, "w") as temp_file:
             temp_file.write(config)
         self.module.run_command("sudo rm -f {}".format(TEMP_DHCP_SERVER_CONFIG_PATH))
