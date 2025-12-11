@@ -4233,6 +4233,10 @@ test_nbr_health.py:
     reason: "Test case has issue on the t0-isolated-d256u256s2 topo."
     conditions:
       - "'t0-isolated-d256u256s2' in topo_name and platform in ['x86_64-nvidia_sn5640-r0']"
+  skip:
+    reason: "Timeout on the t1 full topo"
+    conditions:
+      - "'t1-isolated-d448u15-lag' in topo_name and platform in ['x86_64-nvidia_sn5640-r0']"
 
 #######################################
 #####         pktgen              #####
