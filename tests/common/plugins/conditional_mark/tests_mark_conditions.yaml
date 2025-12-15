@@ -2042,16 +2042,11 @@ fib/test_fib.py::test_hash[ipv6]:
 
 fib/test_fib.py::test_ipinip_hash:
   skip:
-    reason: 'ipinip hash test is not fully supported on mellanox platform (case#00581265). Skip on t1-isolated-d32/128 topos'
+    reason: 'ipinip hash test is not fully supported on mellanox platform (case#00581265). Skip on t1-isolated-d32/128 topos. Skip for IPv6-only topologies'
     conditions_logical_operator: or
     conditions:
       - "asic_type in ['mellanox']"
       - "topo_name in ['t1-isolated-d128', 't1-isolated-d32']"
-
-fib/test_fib.py::test_ipinip_hash[ipv4:
-  skip:
-    reason: "Skip for IPv6-only topologies"
-    conditions:
       - "'-v6-' in topo_name"
 
 fib/test_fib.py::test_ipinip_hash_negative[ipv4:
