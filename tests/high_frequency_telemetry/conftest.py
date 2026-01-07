@@ -1,8 +1,80 @@
 import pytest
 import logging
+import re
 import time
 
 logger = logging.getLogger(__name__)
+
+
+@pytest.fixture(scope="module", autouse=True)
+def sync_asic_time(duthosts, enum_rand_one_per_hwsku_hostname):
+    """Ensure ASIC PHC time is in sync before any tests run in this module.
+
+    Installs linuxptp (after upgrading packages) via the required proxies,
+    then checks PHC time on /dev/ptp1. If drift from system time exceeds
+    10 minutes, it resets PHC time using phc_ctl set.
+    """
+    duthost = duthosts[enum_rand_one_per_hwsku_hostname]
+
+    proxy_env = (
+        "DEBIAN_FRONTEND=noninteractive "
+        "http_proxy=http://10.201.148.40:8080 "
+        "https_proxy=http://10.201.148.40:8080"
+    )
+
+    # Keep package metadata fresh and upgrade before installing linuxptp.
+    duthost.shell(
+        f"sudo -E env {proxy_env} apt-get update",
+        module_ignore_errors=False,
+    )
+
+    duthost.shell(
+        f"sudo -E env {proxy_env} apt-get -y install linuxptp "
+        "-o Dpkg::Options::=--force-confdef "
+        "-o Dpkg::Options::=--force-confold",
+        module_ignore_errors=False,
+    )
+
+    def _get_phc_epoch():
+        """Return PHC epoch seconds from phc_ctl output or None if unknown."""
+        result = duthost.shell(
+            "sudo phc_ctl /dev/ptp1 get",
+            module_ignore_errors=True,
+        )
+        output = result.get("stdout", "")
+        match = re.search(r"clock time is (\d+(?:\.\d+)?)", output)
+        if match:
+            try:
+                return float(match.group(1))
+            except ValueError:
+                return None
+        logger.warning("Unable to parse phc_ctl output: %s", output)
+        return None
+
+    phc_epoch = _get_phc_epoch()
+    system_epoch = float(
+        duthost.shell(
+            "date +%s",
+            module_ignore_errors=False,
+        )["stdout"].strip()
+    )
+
+    if phc_epoch is None:
+        logger.info("PHC time unknown; syncing with system clock")
+        duthost.shell("sudo phc_ctl /dev/ptp1 set", module_ignore_errors=False)
+        return
+
+    drift = abs(system_epoch - phc_epoch)
+    max_allowed_drift = 600  # 10 minutes
+
+    if drift > max_allowed_drift:
+        logger.info(
+            "PHC drift %.0fs exceeds threshold; syncing with system clock",
+            drift,
+        )
+        duthost.shell("sudo phc_ctl /dev/ptp1 set", module_ignore_errors=False)
+    else:
+        logger.info("PHC time is within %.0fs drift (drift=%.0fs)", max_allowed_drift, drift)
 
 
 @pytest.fixture(scope="function")
