@@ -96,6 +96,10 @@ def change_and_wait_aaa_config_update(duthost, command, last_timestamp=None, tim
 
 
 def ssh_run_command(ssh_client, command):
+    # Check if SSH transport is active before attempting command execution
+    if ssh_client.get_transport() is None or not ssh_client.get_transport().is_active():
+        raise paramiko.ssh_exception.SSHException("SSH session not active")
+
     stdin, stdout, stderr = ssh_client.exec_command(command, timeout=TIMEOUT_LIMIT)
     exit_code = stdout.channel.recv_exit_status()
     return exit_code, stdout, stderr
