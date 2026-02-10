@@ -310,19 +310,6 @@ class GenerateGoldenConfigDBModule(object):
 
         return json.dumps(gold_config_db, indent=4)
 
-    def generate_dummy_hft_config_db(self, config):
-        json_config = json.loads(config)
-        json_config["HIGH_FREQUENCY_TELEMETRY_PROFILE"] = {
-            "default": {
-                "stream_state": "disabled",
-                "poll_interval": "10000"
-            }
-        }
-        json_config["HIGH_FREQUENCY_TELEMETRY_GROUP"] = {
-            "default|PORT": {}
-        }
-        return json.dumps(json_config, indent=4)
-
     def generate(self):
         module_msg = "Success to generate golden_config_db.json"
         # topo check
