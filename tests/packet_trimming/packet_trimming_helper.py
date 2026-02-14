@@ -397,7 +397,6 @@ def create_blocking_scheduler(duthost):
         # meter_type is platform specific
         if duthost.get_asic_name() == 'th5':
             cmd_create += f' "meter_type" {SCHEDULER_METER_TYPE}'
-
         duthost.shell(cmd_create)
         logger.info(f"Successfully created blocking scheduler: {BLOCK_DATA_PLANE_SCHEDULER_NAME}")
 
