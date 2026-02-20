@@ -187,8 +187,7 @@ class ControlPlaneBaseTest(BaseTest):
         self.log("Sent out %d packets in %ds" % (send_count, self.DEFAULT_SEND_INTERVAL_SEC))
         # Wait a little bit for all the packets to make it through
         time.sleep(self.DEFAULT_RECEIVE_WAIT_TIME)
-        recv_count = testutils.count_matched_packets_all_ports(
-            self, packet, [recv_intf[1]], recv_intf[0], timeout=10)
+        recv_count = testutils.count_matched_packets_all_ports(self, packet, [recv_intf[1]], recv_intf[0], timeout=10)
         self.log("Received %d packets after sleep %ds" % (recv_count, self.DEFAULT_RECEIVE_WAIT_TIME))
 
         ptf_tx_count = int(post_test_ptf_tx_counter[1] - pre_test_ptf_tx_counter[1])
@@ -294,7 +293,7 @@ class ARPTest(PolicyTest):
     def construct_packet(self, port_number):
         src_mac = self.my_mac[port_number]
         src_ip = self.myip
-        dst_ip = "169.254.254.254"  # Non-existent IP to avoid triggering ARP response trap
+        dst_ip = self.myip  # GARP to avoid triggering ARP response trap
 
         packet = testutils.simple_arp_packet(
             eth_dst='ff:ff:ff:ff:ff:ff',
