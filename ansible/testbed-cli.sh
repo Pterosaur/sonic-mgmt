@@ -458,10 +458,10 @@ function restart_ptf
 
   echo "Restart ptf ptf_${vm_set_name} for testbed '${testbed_name}'"
 
-#  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i $vmfile testbed_renumber_vm_topology.yml --vault-password-file="${passwd}" \
-#      -l "$server" -e testbed_name="$testbed_name" -e duts_name="$duts" -e VM_base="$vm_base" -e ptf_ip="$ptf_ip" \
-#      -e topo="$topo" -e vm_set_name="$vm_set_name" -e ptf_imagename="$ptf_imagename" -e ptf_ipv6="$ptf_ipv6" \
-#      -e ptf_extra_mgmt_ip="$ptf_extra_mgmt_ip" -e netns_mgmt_ip="$netns_mgmt_ip" $@
+  ANSIBLE_SCP_IF_SSH=y ansible-playbook -i $vmfile testbed_renumber_vm_topology.yml --vault-password-file="${passwd}" \
+      -l "$server" -e testbed_name="$testbed_name" -e duts_name="$duts" -e VM_base="$vm_base" -e ptf_ip="$ptf_ip" \
+      -e topo="$topo" -e vm_set_name="$vm_set_name" -e ptf_imagename="$ptf_imagename" -e ptf_ipv6="$ptf_ipv6" \
+      -e ptf_extra_mgmt_ip="$ptf_extra_mgmt_ip" -e netns_mgmt_ip="$netns_mgmt_ip" $@
 
   echo Done
 }
