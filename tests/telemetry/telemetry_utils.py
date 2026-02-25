@@ -117,12 +117,15 @@ def generate_client_cli(duthost, gnxi_path, method=METHOD_GET, xpath="COUNTERS/E
     if namespace is not None:
         ns = "/{}".format(namespace)
 
-    # This command structure is critical. It does three things:
+    # This command structure is critical. It does four things:
     # 1. Activates the virtual environment using the POSIX-compliant '.' command.
-    # 2. Changes to the gnmi_cli_py directory, which is required for the protobuf imports to work.
-    # 3. Executes the py_gnmicli.py script.
+    # 2. Sets PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python to ensure compatibility
+    #    with older _pb2.py files when protobuf >= 4.x is installed.
+    # 3. Changes to the gnmi_cli_py directory, which is required for the protobuf imports to work.
+    # 4. Executes the py_gnmicli.py script.
     cmdFormat = '. /root/env-python3/bin/activate && cd {7}gnmi_cli_py' \
-                ' && python py_gnmicli.py -g -t {0} -p {1} -m {2} -x {3} -xt {4}{5} -o {6}'
+                ' && PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python' \
+                ' python py_gnmicli.py -g -t {0} -p {1} -m {2} -x {3} -xt {4}{5} -o {6}'
     cmd = cmdFormat.format(duthost.mgmt_ip, env.gnmi_port,
                            method, xpath, target, ns,
                            "ndastreamingservertest", gnxi_path)
