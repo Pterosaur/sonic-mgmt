@@ -106,6 +106,11 @@ def setup_streaming_telemetry_context(is_ipv6, duthost, localhost, ptfhost, gnxi
         else:
             file_exists = ptfhost.stat(path=gnxi_path + "gnmi_cli_py/py_gnmicli.py")
             py_assert(file_exists["stat"]["exists"] is True)
+        # Ensure protobuf package is compatible with the generated _pb2.py files in gnxi.
+        # Try to downgrade protobuf; if this fails, the PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
+        # env var set in generate_client_cli() will serve as a fallback.
+        ptfhost.shell("/root/env-python3/bin/pip install 'protobuf<=3.20.3'", module_ignore_errors=True)
+        logger.info("Attempted protobuf downgrade on ptfhost for gnxi compatibility.")
     except RunAnsibleModuleFail as e:
         logger.info("Error happens in the setup period of setup_streaming_telemetry, recover the telemetry.")
         restore_telemetry_forpyclient(duthost, default_client_auth)
