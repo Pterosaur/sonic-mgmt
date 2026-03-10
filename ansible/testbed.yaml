@@ -2116,7 +2116,7 @@
 
 - conf-name: vms95-t1-sn5640-3
   group-name: vms95-1
-  topo: t1-isolated-d448u15-lag
+  topo: t1-isolated-d56u1-lag
   ptf_image_name: docker-ptf
   ptf: vms95-1
   ptf_ip: 10.64.247.176/25
