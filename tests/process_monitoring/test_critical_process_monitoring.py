@@ -327,6 +327,9 @@ def get_expected_alerting_messages_supervisor(duthost, containers_in_namespaces)
                 # TODO: Should remove the following two lines once the issue was solved in the image.
                 if "gnmi" in container_name_in_namespace and critical_process == "gnmi-native":
                     continue
+                # Skip 'otel' process since it would autorestart
+                if "otel" in container_name_in_namespace and critical_process == "otel":
+                    continue
 
                 logger.info("Generating the regex of expected alerting message for process '{}' in container '{}'"
                             .format(critical_process, container_name_in_namespace))
