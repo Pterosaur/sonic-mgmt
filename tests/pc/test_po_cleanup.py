@@ -3,7 +3,7 @@ import pytest
 import logging
 from tests.common.utilities import wait_until
 from tests.common import config_reload
-from tests.common.plugins.loganalyzer.loganalyzer import LogAnalyzer
+from tests.common.plugins.loganalyzer.loganalyzer import DisableLogrotateCronContext, LogAnalyzer
 
 pytestmark = [
     pytest.mark.disable_route_check,
@@ -110,23 +110,37 @@ def test_po_cleanup_after_reload(duthosts, enum_rand_one_per_hwsku_frontend_host
                 asic_id = ""
             duthost.command("docker exec swss{} supervisorctl stop rsyslogd".format(asic_id))
 
-        with loganalyzer:
-            try:
-                logging.info("Reloading config..")
-                config_reload(duthost, wait=240, safe_reload=True, wait_for_bgp=True)
-            finally:
-                # Kill CPU stress before exiting the loganalyzer context manager.
-                # The loganalyzer __exit__ places an end marker via the syslog UDP
-                # socket (/dev/log).  Under heavy CPU load the host rsyslogd cannot
-                # keep up and its UDP receive buffer overflows, silently dropping
-                # the marker and causing a RuntimeError.
-                duthost.shell("killall yes", module_ignore_errors=True)
-                # After config_reload under CPU stress, rsyslogd accumulates a
-                # large backlog from all restarting containers.  Flush rsyslogd
-                # and wait long enough for it to drain the /dev/log socket buffer
-                # so the end marker is not dropped.
-                duthost.shell("sudo kill -HUP $(pgrep -x rsyslogd)", module_ignore_errors=True)
-                time.sleep(30)
+        # Disable logrotate during the test.  The config_reload under CPU
+        # stress generates heavy syslog traffic.  If the system logrotate
+        # timer fires mid-test it rotates /var/log/syslog, potentially
+        # moving the loganalyzer markers beyond syslog.1 into compressed
+        # archives that are not searched, causing a RuntimeError.
+        with DisableLogrotateCronContext(duthost):
+            with loganalyzer:
+                try:
+                    logging.info("Reloading config..")
+                    config_reload(duthost, wait=240, safe_reload=True, wait_for_bgp=True)
+                finally:
+                    # Kill CPU stress before loganalyzer __exit__ places the end
+                    # marker.  Under heavy CPU load the host rsyslogd cannot keep
+                    # up and its UDP receive buffer overflows, silently dropping
+                    # the marker.
+                    duthost.shell("killall yes", module_ignore_errors=True)
+                    # Wait for rsyslogd to drain the /dev/log socket buffer
+                    # backlog.  Under CPU stress, config_reload floods the socket
+                    # and the backlog can take minutes to drain even after the
+                    # stress ends.  Poll until /var/log/syslog stops growing
+                    # (stable for two consecutive 10-second intervals), meaning
+                    # rsyslogd has caught up and it is safe to place the end marker.
+                    prev_size = None
+                    for _ in range(30):
+                        result = duthost.shell("stat -c %s /var/log/syslog",
+                                               module_ignore_errors=True)
+                        curr_size = result.get('stdout', '').strip()
+                        if curr_size == prev_size:
+                            break
+                        prev_size = curr_size
+                        time.sleep(10)
     except Exception:
         duthost.shell("killall yes", module_ignore_errors=True)
         raise
