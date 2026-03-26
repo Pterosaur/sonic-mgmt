@@ -655,9 +655,11 @@ decap/test_decap.py::test_decap[ttl=pipe, dscp=pipe, vxlan=disable]:
       - "(asic_type in ['broadcom'] and release not in ['201811', '201911']) or (asic_type in ['cisco-8000'])"
       - "topo_name in ['t1-isolated-d128', 't1-isolated-d32']"
   xfail:
-    reason: "Test case has issue on the t0-isolated-d256u256s2 topo."
+    reason: "Decap is not supported on x86_64-nvidia_sn5640-r0. Test case also has issue on the t0-isolated-d256u256s2 topo."
+    conditions_logical_operator: or
     conditions:
-      - "'t0-isolated-d256u256s2' in topo_name and platform in ['x86_64-nvidia_sn5640-r0']"
+      - "platform in ['x86_64-nvidia_sn5640-r0']"
+      - "'t0-isolated-d256u256s2' in topo_name"
 
 decap/test_decap.py::test_decap[ttl=pipe, dscp=pipe, vxlan=set_unset]:
   skip:
@@ -667,9 +669,11 @@ decap/test_decap.py::test_decap[ttl=pipe, dscp=pipe, vxlan=set_unset]:
       - "(asic_type in ['broadcom'] and release not in ['201811', '201911']) or (asic_type in ['cisco-8000']) or (asic_type in ['marvell'])"
       - "topo_name in ['t1-isolated-d128', 't1-isolated-d32']"
   xfail:
-    reason: "Test case has issue on the t0-isolated-d256u256s2 topo."
+    reason: "Decap is not supported on x86_64-nvidia_sn5640-r0. Test case also has issue on the t0-isolated-d256u256s2 topo."
+    conditions_logical_operator: or
     conditions:
-      - "'t0-isolated-d256u256s2' in topo_name and platform in ['x86_64-nvidia_sn5640-r0']"
+      - "platform in ['x86_64-nvidia_sn5640-r0']"
+      - "'t0-isolated-d256u256s2' in topo_name"
 
 decap/test_decap.py::test_decap[ttl=pipe, dscp=uniform, vxlan=disable]:
   skip:
@@ -680,9 +684,11 @@ decap/test_decap.py::test_decap[ttl=pipe, dscp=uniform, vxlan=disable]:
       - "'7260CX3' in hwsku and release in ['202305'] and 't1' in topo_type"
       - "topo_name in ['t1-isolated-d128', 't1-isolated-d32']"
   xfail:
-    reason: "Test case has issue on the t0-isolated-d256u256s2 topo."
+    reason: "Decap is not supported on x86_64-nvidia_sn5640-r0. Test case also has issue on the t0-isolated-d256u256s2 topo."
+    conditions_logical_operator: or
     conditions:
-      - "'t0-isolated-d256u256s2' in topo_name and platform in ['x86_64-nvidia_sn5640-r0']"
+      - "platform in ['x86_64-nvidia_sn5640-r0']"
+      - "'t0-isolated-d256u256s2' in topo_name"
 
 decap/test_decap.py::test_decap[ttl=pipe, dscp=uniform, vxlan=set_unset]:
   skip:
