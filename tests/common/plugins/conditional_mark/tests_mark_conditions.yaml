@@ -379,6 +379,12 @@ dash/test_relaxed_match_negative.py:
 #######################################
 #####            decap            #####
 #######################################
+decap/test_decap.py:
+  xfail:
+    reason: "Decap is not supported on x86_64-nvidia_sn5640-r0."
+    conditions:
+      - "platform in ['x86_64-nvidia_sn5640-r0']"
+
 decap/test_decap.py::test_decap[ttl=pipe, dscp=pipe, vxlan=disable]:
   skip:
     reason: "Not supported on broadcom after 201911 release and cisco-8000 all releases and marvell asics"
@@ -2865,6 +2871,12 @@ vxlan/test_vxlan_crm.py::Test_VxLAN_Crm::test_crm_512_nexthop_groups[v6_in_v6]:
     conditions:
       - "(is_multi_asic == True) or (platform not in ['x86_64-8102_64h_o-r0', 'x86_64-8101_32fh_o-r0', 'x86_64-mlnx_msn4600c-r0', 'x86_64-mlnx_msn2700-r0', 'x86_64-mlnx_msn2700a1-r0', 'x86_64-kvm_x86_64-r0', 'x86_64-mlnx_msn4700-r0', 'x86_64-nvidia_sn4280-r0', 'x86_64-8102_28fh_dpu_o-r0'])"
       - "asic_gen == 'spc1'"
+
+vxlan/test_vnet_decap.py::test_vnet_decap:
+  xfail:
+    reason: "Decap is not supported on x86_64-nvidia_sn5640-r0."
+    conditions:
+      - "platform in ['x86_64-nvidia_sn5640-r0']"
 
 vxlan/test_vxlan_decap.py:
   skip:
