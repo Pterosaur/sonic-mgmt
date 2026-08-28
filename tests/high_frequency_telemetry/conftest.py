@@ -12,12 +12,14 @@ from tests.high_frequency_telemetry.counter_profiles import (
 from tests.high_frequency_telemetry.utilities import (
     InfluxDbSink,
     cleanup_hft_config,
+    cleanup_hft_heatmap_config,
     enable_otel_collector,
     ensure_countersyncd_daemon,
     get_available_ports,
     get_configured_buffer_pools,
     get_configured_buffer_queue_objects,
     get_configured_queue_objects,
+    is_hft_heatmap_supported,
     install_otel_collector_config,
     is_otel_image_available,
     render_otel_collector_config,
@@ -44,7 +46,9 @@ TEST_HFT_PROFILES = (
     "port_shutdown_profile",
     "e2e_port_profile",
     "poll_interval_profile_1000",
+    "heatmap_e2e_profile",
 )
+TEST_HFT_AGGREGATORS = ("heatmap_e2e_aggregator",)
 
 
 def _is_otel_container_stopped(duthost):
@@ -119,7 +123,9 @@ def skip_unsupported_hft_test(request, duthosts,
         pytest.fail("Tests using hft_influxdb must declare hft_requirements")
     if len(marker.args) != 1 or not isinstance(marker.args[0], CounterObjectType):
         pytest.fail("hft_requirements requires one CounterObjectType argument")
-    unknown_options = set(marker.kwargs) - {"counter", "oper_up_port"}
+    unknown_options = set(marker.kwargs) - {
+        "counter", "counters", "heatmap", "oper_up_port",
+    }
     if unknown_options:
         pytest.fail(
             "Unsupported hft_requirements options: "
@@ -127,21 +133,46 @@ def skip_unsupported_hft_test(request, duthosts,
         )
     counter_type = marker.args[0]
     required_counter = marker.kwargs.get("counter")
+    required_counters = marker.kwargs.get("counters")
+    if required_counter is not None and required_counters is not None:
+        pytest.fail("hft_requirements accepts either counter or counters, not both")
     if "counter" in marker.kwargs and (
             not isinstance(required_counter, str) or not required_counter):
         pytest.fail("hft_requirements counter must be a non-empty string")
+    if required_counters is not None:
+        if isinstance(required_counters, str) or not isinstance(
+                required_counters, (list, tuple, set)):
+            pytest.fail("hft_requirements counters must be a sequence")
+        if not required_counters or any(
+                not isinstance(counter, str) or not counter
+                for counter in required_counters):
+            pytest.fail(
+                "hft_requirements counters must contain non-empty strings"
+            )
+    required_counters = set(required_counters or ())
+    if required_counter:
+        required_counters.add(required_counter)
     require_oper_up_port = marker.kwargs.get("oper_up_port", False)
     if not isinstance(require_oper_up_port, bool):
         pytest.fail("hft_requirements oper_up_port must be a bool")
     if "oper_up_port" in marker.kwargs \
             and counter_type != CounterObjectType.PORT:
         pytest.fail("oper_up_port is valid only for PORT requirements")
+    require_heatmap = marker.kwargs.get("heatmap", False)
+    if not isinstance(require_heatmap, bool):
+        pytest.fail("hft_requirements heatmap must be a bool")
+    if require_heatmap:
+        request.getfixturevalue("skip_unsupported_hft_platform")
 
     counters = get_support_counter_list(duthost, counter_type)
-    if required_counter and required_counter not in counters:
+    missing_counters = required_counters - set(counters)
+    if missing_counters:
         pytest.skip(
-            f"{required_counter} is not supported on this platform"
+            "Required counters are not supported on this platform: "
+            f"{sorted(missing_counters)}"
         )
+    if require_heatmap and not is_hft_heatmap_supported(duthost):
+        pytest.skip("The DUT image does not provide HFT heatmap support")
     if counter_type == CounterObjectType.INGRESS_PRIORITY_GROUP:
         objects = get_configured_buffer_queue_objects(duthost)
         if not objects:
@@ -439,5 +470,15 @@ def cleanup_high_frequency_telemetry(
         key.split("|", 2)[1] for key in group_keys
         if key.count("|") >= 2
     )
-    for profile_name in set(TEST_HFT_PROFILES) & existing_profiles:
-        cleanup_hft_config(duthost, profile_name)
+    heatmap_profile = "heatmap_e2e_profile"
+    try:
+        for profile_name in (
+                set(TEST_HFT_PROFILES) - {heatmap_profile}
+        ) & existing_profiles:
+            cleanup_hft_config(duthost, profile_name)
+    finally:
+        cleanup_hft_heatmap_config(
+            duthost,
+            heatmap_profile,
+            TEST_HFT_AGGREGATORS[0],
+        )
