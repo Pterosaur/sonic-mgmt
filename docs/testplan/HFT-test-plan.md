@@ -21,6 +21,7 @@
     - [Test HFT Port Shutdown Stream](#test-case-test-hft-port-shutdown-stream)
   - [End-to-End Tests](#end-to-end-tests)
     - [Test HFT End-to-End InfluxDB](#test-case-test-hft-end-to-end-influxdb)
+    - [Test HFT Heatmap Histograms](#test-case-test-hft-heatmap-histograms)
 - [Open/Action Items](#openaction-items)
 
 ---
@@ -40,6 +41,7 @@ The test suite covers:
 - **Configuration lifecycle**: Validating create → delete → recreate of HFT profiles/groups while `countersyncd` runs continuously.
 - **Poll interval accuracy**: Verifying the measured message rate matches expected rate based on configured poll interval.
 - **Port state interaction**: Confirming counter behavior (increasing vs. stable) when monitored ports are shut down/started up under traffic.
+- **Heatmap aggregation**: Verifying custom and semantic explicit histogram layouts, stable schema tags, bucket counts, and independent heatmap cadence.
 - **Test infrastructure**: Validation of fixtures (`ensure_swss_ready`, `cleanup_high_frequency_telemetry`, `hft_influxdb`) and utility functions for HFT config management.
 
 ### Testbed
@@ -77,6 +79,7 @@ HFT Phase 1 supports key AI data center statistics across four object types:
 - The DUT must provide the `otel` container image.
 - InfluxDB 3 Core (`influxdb3`) must be installed on the PTF host.
 - HFT CLI commands (`config hft add/del/enable/disable`) must be available on the DUT.
+- Heatmap tests require the HFT aggregator, histogram, and profile binding schema supported by the DUT image.
 - CONFIG_DB (database 4) must be accessible for HFT table management.
 - COUNTERS_DB (database 2) must be accessible for queue/buffer object discovery.
 - For port shutdown tests: PTF adapter must be available for traffic injection.
@@ -107,6 +110,12 @@ the process startup cost for every case. The fixture stops only the InfluxDB PID
 it owns at module teardown. Multi-phase cases retain data between phases and
 isolate phases with database watermarks. Standard DUT memory-utilization
 monitoring remains enabled for all HFT cases.
+
+Histogram points use the default InfluxDB exporter
+`telegraf-prometheus-v1` schema. Each explicit bound is a field containing the
+cumulative count at that upper bound; `+Inf` contains the total cumulative
+count. The same row contains `count`, `sum`, `min`, and `max`, while HFT
+identity, quantity, value kind, and schema are preserved as tags.
 
 Each case declares its counter, object, and port prerequisites with the
 `hft_requirements` marker. Before that case can request HFT infrastructure, the
@@ -396,6 +405,36 @@ Pipeline:   metrics → [otlp] → [batch] → [influxdb]
 - Otel container starts successfully on DUT.
 - Every expected series contains at least 100 points within 45 seconds,
   confirming metrics flowed through the full pipeline.
+
+---
+
+#### Test Case: Test HFT Heatmap Histograms
+
+| Item | Description |
+|---|---|
+| **Test Name** | `test_hft_heatmap_explicit_and_default_histograms` |
+| **Test File** | `tests/high_frequency_telemetry/test_hft_end_to_end.py` |
+| **Objective** | Validate byte-delta heatmaps through `countersyncd` → OTEL Explicit Histogram → InfluxDB. |
+| **Fixtures** | `hft_influxdb` |
+| **Topology** | `any` |
+
+**Test Steps**
+1. Select one operationally-up, PTF-mapped PORT supporting `IF_IN_OCTETS` and `IF_OUT_OCTETS`, after confirming matching heatmap YANG, CLI, and runtime support.
+2. Atomically create a 10ms profile bound to an aggregator with a 100ms reporting rate and 1s heatmap interval.
+3. Select both octet counters for heatmaps. Override `IF_IN_OCTETS` with custom raw-byte bounds `[0, 128, 1024, 8192]`; leave `IF_OUT_OCTETS` on the semantic default layout.
+4. Independently derive the default 42 bounds from common 100/200/400/800/1600 Gbit/s speeds and the 50/75/90/95/98/99/99.5/99.8/100% utilization bands.
+5. Reproduce each expected `heatmap_schema` identifier from the value kind, quantity, and complete bound list.
+6. Send continuous ingress traffic and verify both cumulative gauge series are exported at the configured 100ms reporting cadence.
+7. Wait for four histogram windows for both counters in InfluxDB so the initial partial window can be excluded.
+8. Query each heatmap measurement without a schema filter and reject any unexpected identity, quantity, schema, or field layout.
+9. Validate three aligned full windows: exact start/end times, ten observations, every explicit-bound field, cumulative nonnegative integer buckets, `+Inf == count`, and count/sum/min/max consistency with each bound.
+10. For each full window, verify the histogram sum equals the cumulative gauge value at the end minus the value at the OTLP start time, proving the observations are raw byte deltas.
+11. Remove the profile, group, histogram child, and aggregator, and verify no suite-owned configuration remains.
+
+**Expected Results**
+- Both custom and semantic layouts are exported as explicit histograms without being mixed into one schema.
+- `heatmap_value_kind=delta`, `heatmap_quantity=delta_bytes`, and `hft_session` identify the source semantics.
+- Every histogram is internally coherent and consecutive points follow the configured heatmap interval.
 
 ---
 

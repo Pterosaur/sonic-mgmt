@@ -9,7 +9,7 @@ import threading
 import time
 from collections import namedtuple
 from collections.abc import Iterable
-from datetime import datetime
+from datetime import datetime, timezone
 
 import ptf.testutils as testutils
 import pytest
@@ -28,6 +28,10 @@ HftSeries = namedtuple(
     "HftSeries",
     ["measurement", "object_name", "type_id", "stat_id", "counter_name"],
 )
+
+HFT_AGGREGATOR_TABLE = "HIGH_FREQUENCY_TELEMETRY_AGGREGATOR"
+HFT_HISTOGRAM_TABLE = "HIGH_FREQUENCY_TELEMETRY_AGGREGATOR_HISTOGRAM"
+HFT_ROLLOVER_TABLE = "HIGH_FREQUENCY_TELEMETRY_AGGREGATOR_ROLLOVER"
 
 
 def get_available_ports(duthost, tbinfo, desired_ports=2, min_ports=None):
@@ -200,6 +204,18 @@ def _get_hft_config_keys(duthost):
     return profiles, groups
 
 
+def _get_config_table_keys(duthost, table_name):
+    result = duthost.shell(
+        f"redis-cli -n 4 --raw KEYS '{table_name}|*'",
+        module_ignore_errors=False,
+    )
+    return [line for line in result.get("stdout_lines", []) if line]
+
+
+def _json_pointer_component(value):
+    return str(value).replace("~", "~0").replace("/", "~1")
+
+
 def _apply_hft_patch(duthost, operations):
     payload = shlex.quote(json.dumps(operations, separators=(",", ":")))
     return duthost.shell(
@@ -267,6 +283,114 @@ def setup_hft_config(duthost, profile_name, group_name, object_names,
     return result
 
 
+def setup_hft_heatmap_config(
+        duthost, profile_name, aggregator_name, group_name, object_names,
+        object_counters, heatmap_interval, poll_interval=10_000,
+        reporting_rate=None, explicit_bounds=None):
+    """Create one profile with a heatmap aggregator in a validated patch."""
+    group_type = _normalize_hft_group_type(group_name)
+    objects = [
+        item.strip() for item in _stringify_sequence(object_names).split(",")
+        if item.strip()
+    ]
+    counters = [
+        item.strip() for item in _stringify_sequence(object_counters).split(",")
+        if item.strip()
+    ]
+    pytest_assert(
+        objects, "Heatmap configuration requires at least one object"
+    )
+    pytest_assert(
+        counters, "Heatmap configuration requires at least one counter"
+    )
+
+    profiles, groups = _get_hft_config_keys(duthost)
+    aggregator_keys = _get_config_table_keys(duthost, HFT_AGGREGATOR_TABLE)
+    histogram_keys = _get_config_table_keys(duthost, HFT_HISTOGRAM_TABLE)
+    rollover_keys = _get_config_table_keys(duthost, HFT_ROLLOVER_TABLE)
+    pytest_assert(
+        not profiles and not groups and not aggregator_keys
+        and not histogram_keys and not rollover_keys,
+        "An HFT configuration already exists: "
+        f"profiles={profiles}, groups={groups}, aggregators={aggregator_keys}, "
+        f"histograms={histogram_keys}, rollovers={rollover_keys}",
+    )
+
+    heatmap_selectors = [f"{group_type}|{counter}" for counter in counters]
+    aggregator = {
+        "heatmap_interval": str(int(heatmap_interval)),
+        "heatmap_counters": heatmap_selectors,
+    }
+    if reporting_rate is not None:
+        aggregator["reporting_rate"] = str(int(reporting_rate))
+
+    operations = [{
+        "op": "add",
+        "path": f"/{HFT_AGGREGATOR_TABLE}",
+        "value": {aggregator_name: aggregator},
+    }]
+    if explicit_bounds:
+        histograms = {}
+        for counter_name, bounds in explicit_bounds.items():
+            pytest_assert(
+                counter_name in counters,
+                f"Histogram counter {counter_name} is not selected for heatmap",
+            )
+            normalized_bounds = [int(bound) for bound in bounds]
+            pytest_assert(
+                normalized_bounds
+                and all(
+                    lower < upper
+                    for lower, upper in zip(
+                        normalized_bounds, normalized_bounds[1:]
+                    )
+                ),
+                f"Histogram bounds must be strictly increasing: {bounds}",
+            )
+            pytest_assert(
+                all(0 <= bound <= 2 ** 53 for bound in normalized_bounds),
+                f"Histogram bounds must be in the range 0..2^53: {bounds}",
+            )
+            histograms[f"{aggregator_name}|{group_type}|{counter_name}"] = {
+                "explicit_bounds": [str(bound) for bound in normalized_bounds],
+            }
+        operations.append({
+            "op": "add",
+            "path": f"/{HFT_HISTOGRAM_TABLE}",
+            "value": histograms,
+        })
+    operations.extend([
+        {
+            "op": "add",
+            "path": "/HIGH_FREQUENCY_TELEMETRY_PROFILE",
+            "value": {
+                profile_name: {
+                    "stream_state": "enabled",
+                    "poll_interval": str(int(poll_interval)),
+                    "aggregator": aggregator_name,
+                },
+            },
+        },
+        {
+            "op": "add",
+            "path": "/HIGH_FREQUENCY_TELEMETRY_GROUP",
+            "value": {
+                f"{profile_name}|{group_type}": {
+                    "object_names": objects,
+                    "object_counters": counters,
+                },
+            },
+        },
+    ])
+    result = _apply_hft_patch(duthost, operations)
+    logger.info(
+        "Created HFT heatmap profile %s with aggregator %s",
+        profile_name,
+        aggregator_name,
+    )
+    return result
+
+
 def setup_hft_stream_state(duthost, profile_name, stream_state):
     """Enable or disable an HFT profile."""
     profile_arg = shlex.quote(str(profile_name))
@@ -287,7 +411,8 @@ def setup_hft_stream_state(duthost, profile_name, stream_state):
 def cleanup_hft_config(duthost, profile_name, group_names=None):
     """Delete groups, wait for session cleanup, then delete the profile."""
     profile_arg = shlex.quote(str(profile_name))
-    _, group_keys = _get_hft_config_keys(duthost)
+    profile_keys, group_keys = _get_hft_config_keys(duthost)
+    failures = []
     if group_names is None:
         group_names = [
             key.split("|", 2)[2] for key in group_keys
@@ -303,10 +428,14 @@ def cleanup_hft_config(duthost, profile_name, group_names=None):
         )
         if group_key not in group_keys:
             continue
-        duthost.shell(
+        delete_result = duthost.shell(
             f"sudo config hft del group {profile_arg} {group_type}",
             module_ignore_errors=True,
         )
+        if delete_result.get("rc") != 0:
+            failures.append(
+                f"failed to delete group {group_key}: {delete_result}"
+            )
         session_key = shlex.quote(
             "HIGH_FREQUENCY_TELEMETRY_SESSION_TABLE|"
             f"{profile_name}|{group_type}"
@@ -317,16 +446,114 @@ def cleanup_hft_config(duthost, profile_name, group_names=None):
             "sleep 1; done; exit 1",
             module_ignore_errors=True,
         )
-        pytest_assert(
-            result.get("rc") == 0,
-            f"HFT session {profile_name}|{group_type} was not removed",
-        )
+        if result.get("rc") != 0:
+            failures.append(
+                f"session {profile_name}|{group_type} was not removed"
+            )
 
-    duthost.shell(
-        f"sudo config hft del profile {profile_arg}",
-        module_ignore_errors=True,
+    profile_key = f"HIGH_FREQUENCY_TELEMETRY_PROFILE|{profile_name}"
+    if profile_key in profile_keys:
+        delete_result = duthost.shell(
+            f"sudo config hft del profile {profile_arg}",
+            module_ignore_errors=True,
+        )
+        if delete_result.get("rc") != 0:
+            failures.append(
+                f"failed to delete profile {profile_key}: {delete_result}"
+            )
+    profile_keys, group_keys = _get_hft_config_keys(duthost)
+    remaining = [
+        key for key in profile_keys
+        if key == f"HIGH_FREQUENCY_TELEMETRY_PROFILE|{profile_name}"
+    ]
+    remaining.extend(
+        key for key in group_keys
+        if key.startswith(
+            f"HIGH_FREQUENCY_TELEMETRY_GROUP|{profile_name}|"
+        )
+    )
+    if remaining:
+        failures.append(f"configuration remains: {remaining}")
+    pytest_assert(
+        not failures,
+        f"Failed to clean HFT profile {profile_name}: " + "; ".join(failures),
     )
     logger.info("Cleaned HFT profile %s", profile_name)
+
+
+def cleanup_hft_aggregator(duthost, aggregator_name):
+    """Delete an aggregator and its child rows through config validation."""
+    operations = []
+    for table_name in (HFT_HISTOGRAM_TABLE, HFT_ROLLOVER_TABLE):
+        keys = _get_config_table_keys(duthost, table_name)
+        selected = [
+            key for key in keys
+            if key.startswith(f"{table_name}|{aggregator_name}|")
+        ]
+        if selected and len(selected) == len(keys):
+            operations.append({"op": "remove", "path": f"/{table_name}"})
+        else:
+            operations.extend(
+                {
+                    "op": "remove",
+                    "path": (
+                        f"/{table_name}/"
+                        f"{_json_pointer_component(key.split('|', 1)[1])}"
+                    ),
+                }
+                for key in selected
+            )
+
+    aggregator_keys = _get_config_table_keys(duthost, HFT_AGGREGATOR_TABLE)
+    full_key = f"{HFT_AGGREGATOR_TABLE}|{aggregator_name}"
+    if full_key in aggregator_keys:
+        path = (
+            f"/{HFT_AGGREGATOR_TABLE}"
+            if len(aggregator_keys) == 1
+            else (
+                f"/{HFT_AGGREGATOR_TABLE}/"
+                f"{_json_pointer_component(aggregator_name)}"
+            )
+        )
+        operations.append({"op": "remove", "path": path})
+    if operations:
+        _apply_hft_patch(duthost, operations)
+
+    remaining = [
+        key
+        for table_name in (
+            HFT_AGGREGATOR_TABLE, HFT_HISTOGRAM_TABLE, HFT_ROLLOVER_TABLE
+        )
+        for key in _get_config_table_keys(duthost, table_name)
+        if key == f"{table_name}|{aggregator_name}"
+        or key.startswith(f"{table_name}|{aggregator_name}|")
+    ]
+    pytest_assert(not remaining, f"Failed to clean HFT aggregator: {remaining}")
+    logger.info("Cleaned HFT aggregator %s", aggregator_name)
+
+
+def cleanup_hft_heatmap_config(duthost, profile_name, aggregator_name,
+                               group_names=None):
+    """Attempt profile and aggregator cleanup without masking either error."""
+    failures = []
+    for resource, cleanup in (
+        (
+            f"profile {profile_name}",
+            lambda: cleanup_hft_config(duthost, profile_name, group_names),
+        ),
+        (
+            f"aggregator {aggregator_name}",
+            lambda: cleanup_hft_aggregator(duthost, aggregator_name),
+        ),
+    ):
+        try:
+            cleanup()
+        except (Exception, pytest.fail.Exception) as exc:
+            failures.append(f"{resource}: {exc}")
+    pytest_assert(
+        not failures,
+        "Failed to clean HFT heatmap resources: " + "; ".join(failures),
+    )
 
 
 def ensure_countersyncd_daemon(duthost):
@@ -353,6 +580,41 @@ def ensure_countersyncd_daemon(duthost):
     return True
 
 
+def is_hft_heatmap_supported(duthost):
+    """Return whether the image has matching heatmap YANG, CLI, and runtime."""
+    yang_path = "/usr/local/yang-models/sonic-high-frequency-telemetry.yang"
+    checks = (
+        (
+            "YANG schema",
+            f"test -r {yang_path} && "
+            f"grep -q 'leaf aggregator' {yang_path} && "
+            f"grep -q 'container {HFT_AGGREGATOR_TABLE}' {yang_path} && "
+            f"grep -q 'container {HFT_HISTOGRAM_TABLE}' {yang_path}",
+        ),
+        (
+            "config CLI",
+            "config hft add aggregator --help >/dev/null 2>&1 && "
+            "config hft add histogram --help >/dev/null 2>&1 && "
+            "config hft add profile --help 2>&1 | grep -q -- '--aggregator'",
+        ),
+        (
+            "countersyncd runtime",
+            "docker exec swss sh -c 'pid=$(supervisorctl pid countersyncd) "
+            "&& test \"$pid\" -gt 0 && grep -a -q "
+            f"{HFT_HISTOGRAM_TABLE} /proc/$pid/exe'",
+        ),
+    )
+    unsupported = []
+    for name, command in checks:
+        result = duthost.shell(command, module_ignore_errors=True)
+        if result.get("rc") != 0:
+            unsupported.append(name)
+    if unsupported:
+        logger.info("HFT heatmap capability checks failed: %s", unsupported)
+        return False
+    return True
+
+
 def render_otel_collector_config(template_path, **kwargs):
     """Render the test OTEL collector configuration."""
     from jinja2 import Environment, StrictUndefined, select_autoescape
@@ -373,7 +635,7 @@ def install_otel_collector_config(duthost, rendered_config,
 def restart_otel_service(duthost, timeout=60):
     """Restart the systemd-managed OTEL service and wait for its collector."""
     duthost.shell(
-        "sudo systemctl restart otel",
+        "sudo systemctl reset-failed otel && sudo systemctl restart otel",
         module_ignore_errors=False,
     )
     pytest_assert(
@@ -598,6 +860,54 @@ def build_expected_series(counter_type, object_names, counter_names):
     return expected
 
 
+def build_expected_heatmap_series(counter_type, object_names, counter_names):
+    """Build exact InfluxDB series expected for heatmap metrics."""
+    return [
+        series._replace(measurement=f"{series.measurement}_heatmap")
+        for series in build_expected_series(
+            counter_type, object_names, counter_names
+        )
+    ]
+
+
+def build_delta_bytes_default_bounds(nominal_interval_us):
+    """Build the semantic byte-delta bounds for one nominal interval."""
+    interval_us = int(nominal_interval_us)
+    pytest_assert(interval_us > 0, "Nominal interval must be greater than zero")
+    speeds_gbps = (100, 200, 400, 800, 1600)
+    utilization_basis_points = (
+        5000, 7500, 9000, 9500, 9800, 9900, 9950, 9980, 10000,
+    )
+    return sorted({
+        0,
+        *(
+            speed * utilization * interval_us // 80
+            for speed in speeds_gbps
+            for utilization in utilization_basis_points
+        ),
+    })
+
+
+def build_heatmap_schema(value_kind, quantity, explicit_bounds):
+    """Reproduce countersyncd's stable heatmap schema identifier."""
+    hash_value = 0xCBF29CE484222325
+    fnv_prime = 0x00000100000001B3
+    payloads = [
+        value_kind.encode(),
+        quantity.encode(),
+        len(explicit_bounds).to_bytes(8, "little"),
+        *(int(bound).to_bytes(8, "little") for bound in explicit_bounds),
+    ]
+    for payload in payloads:
+        for byte in payload:
+            hash_value ^= byte
+            hash_value = (hash_value * fnv_prime) & ((1 << 64) - 1)
+    return (
+        f"hft-explicit-v2:{value_kind}:{quantity}:"
+        f"fnv1a64-{hash_value:016x}"
+    )
+
+
 def _parse_rfc3339_timestamp(value):
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"Missing RFC3339 timestamp: {value!r}")
@@ -609,6 +919,14 @@ def _parse_rfc3339_timestamp(value):
             fraction = clean[dot_index + 1:offset_index][:6]
             clean = clean[:dot_index + 1] + fraction + clean[offset_index:]
     return datetime.fromisoformat(clean).timestamp()
+
+
+def _format_unix_nano_timestamp(value):
+    seconds, nanoseconds = divmod(int(value), 1_000_000_000)
+    base = datetime.fromtimestamp(seconds, timezone.utc).strftime(
+        "%Y-%m-%dT%H:%M:%S"
+    )
+    return f"{base}.{nanoseconds:09d}Z"
 
 
 class InfluxDbSink:
@@ -653,6 +971,61 @@ class InfluxDbSink:
             for row in measurement_rows
             if row.get("name")
         }
+
+    def heatmap_rows(self, series, limit=10):
+        """Return all newest tag variants for one heatmap measurement."""
+        body = self._query(
+            f'SELECT * FROM "{series.measurement}" '
+            f'GROUP BY * ORDER BY time DESC LIMIT {int(limit)}'
+        )
+        return parse_influxdb_json(json.dumps(body)).get(
+            series.measurement, []
+        )
+
+    def wait_for_heatmap_rows(self, series, value_kind, quantity, schema,
+                              session_key,
+                              min_points=2, timeout=30, poll_interval=1):
+        """Wait for one exact heatmap series to have enough histogram rows."""
+        end_time = time.time() + timeout
+        rows = []
+        expected_tags = {
+            "object_name": series.object_name,
+            "sai_type_id": str(series.type_id),
+            "sai_stat_id": str(series.stat_id),
+            "heatmap_value_kind": value_kind,
+            "heatmap_quantity": quantity,
+            "heatmap_schema": schema,
+            "hft_session": session_key,
+        }
+        while time.time() < end_time:
+            rows = self.heatmap_rows(series, limit=min_points * 2)
+            matching = [
+                row for row in rows
+                if all(
+                    str(row.get(key)) == str(value)
+                    for key, value in expected_tags.items()
+                )
+            ]
+            if len(matching) >= min_points:
+                return rows
+            time.sleep(poll_interval)
+        raise AssertionError(
+            f"Timed out waiting for {min_points} heatmap rows for {series}; "
+            f"received {rows}"
+        )
+
+    def gauge_window_values(self, series, start_time_unix_nano, end_time):
+        """Return cumulative gauge values at a histogram window's edges."""
+        expected_key = next(iter(self._expected_map([series])))
+        start_time = _format_unix_nano_timestamp(start_time_unix_nano)
+        start = self.latest([series], cutoff=start_time)
+        end = self.latest([series], cutoff=end_time)
+        pytest_assert(
+            expected_key in start and expected_key in end,
+            f"Missing gauge boundary values for {series}: "
+            f"start={start}, end={end}",
+        )
+        return start[expected_key]["value"], end[expected_key]["value"]
 
     def drop(self):
         """Hard-delete this sink's database."""
